@@ -1,0 +1,339 @@
+tabs:
+    icons:
+        wobqqq.fortify::lang.tabs.config: icon-cog
+        wobqqq.fortify::lang.tabs.ip_firewall: icon-ban
+        wobqqq.fortify::lang.tabs.tests: icon-rocket
+        wobqqq.fortify::lang.tabs.csp: icon-lock
+        wobqqq.fortify::lang.tabs.input_sanitizer: icon-crosshairs
+    fields:
+        ip_firewall[admin_ip_access_section]:
+            label: 'wobqqq.fortify::lang.fields.admin_ip_access'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.ip_firewall'
+        ip_firewall[admin_ip_access_plugin]:
+            label: ''
+            span: full
+            type: partial
+            path: ~/plugins/wobqqq/fortify/controllers/fortify/_admin_ip_access_plugin.htm
+            tab: 'wobqqq.fortify::lang.tabs.ip_firewall'
+        ip_firewall[ip_blocker_section]:
+            label: 'wobqqq.fortify::lang.fields.ip_blocker'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.ip_firewall'
+        ip_firewall[ip_blocker_plugin]:
+            label: ''
+            span: full
+            type: partial
+            path: ~/plugins/wobqqq/fortify/controllers/fortify/_ip_blocker_plugin.htm
+            tab: 'wobqqq.fortify::lang.tabs.ip_firewall'
+        ip_firewall[smart_ip_blocker_section]:
+            label: 'wobqqq.fortify::lang.fields.smart_ip_blocker'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.ip_firewall'
+        ip_firewall[smart_ip_blocker_plugin]:
+            label: ''
+            span: full
+            type: partial
+            path: ~/plugins/wobqqq/fortify/controllers/fortify/_smart_ip_blocker_plugin.htm
+            tab: 'wobqqq.fortify::lang.tabs.ip_firewall'
+        csp[section]:
+            label: 'wobqqq.fortify::lang.fields.csp'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.csp'
+        csp[plugin]:
+            label: ''
+            span: full
+            type: partial
+            path: ~/plugins/wobqqq/fortify/controllers/fortify/_csp_plugin.htm
+            tab: 'wobqqq.fortify::lang.tabs.csp'
+        input_sanitizer[section]:
+            label: 'wobqqq.fortify::lang.fields.input_sanitizer'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.input_sanitizer'
+        input_sanitizer[plugin]:
+            label: ''
+            span: full
+            type: partial
+            path: ~/plugins/wobqqq/fortify/controllers/fortify/_input_sanitizer_plugin.htm
+            tab: 'wobqqq.fortify::lang.tabs.input_sanitizer'
+        config[enabled]:
+            label: 'wobqqq.fortify::lang.fields.enabled'
+            span: full
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: false
+            comment: 'wobqqq.fortify::lang.comments.config_enabled'
+            commentHtml: true
+        config[session_section]:
+            label: 'wobqqq.fortify::lang.fields.session'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[session_same_site]:
+            label: 'wobqqq.fortify::lang.fields.session_same_site'
+            span: auto
+            type: dropdown
+            default: 'lax'
+            emptyOption: '-'
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.session_same_site'
+            commentHtml: true
+            options: getSessionSameSiteOptions
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[session_lifetime]:
+            label: 'wobqqq.fortify::lang.fields.session_lifetime'
+            placeholder: 'wobqqq.fortify::lang.fields.session_lifetime'
+            span: auto
+            type: number
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: 120
+            comment: 'wobqqq.fortify::lang.comments.session_lifetime'
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[session_secure]:
+            label: 'wobqqq.fortify::lang.fields.session_secure'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.session_secure'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[session_http_only]:
+            label: 'wobqqq.fortify::lang.fields.session_http_only'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.session_http_only'
+            default: true
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[session_encrypt]:
+            label: 'wobqqq.fortify::lang.fields.session_encrypt'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.session_encrypt'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_section]:
+            label: 'wobqqq.fortify::lang.fields.password_policy'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.password_policy_section'
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_allow_reset]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_allow_reset'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: true
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_require_uppercase]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_require_uppercase'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_require_lowercase]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_require_lowercase'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_require_number]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_require_number'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_require_nonalpha]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_require_nonalpha'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_expire_days]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_expire_days'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[password_policy_min_length]:
+            label: 'wobqqq.fortify::lang.fields.password_policy_min_length'
+            placeholder: 'wobqqq.fortify::lang.fields.password_policy_min_length'
+            span: auto
+            type: number
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            default: 4
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[backend_section]:
+            label: 'wobqqq.fortify::lang.fields.backend'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[backend_force_secure]:
+            label: 'wobqqq.fortify::lang.fields.backend_force_secure'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.backend_force_secure'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        config[backend_force_single_session]:
+            label: 'wobqqq.fortify::lang.fields.backend_force_single_session'
+            span: auto
+            type: switch
+            tab: 'wobqqq.fortify::lang.tabs.config'
+            comment: 'wobqqq.fortify::lang.comments.backend_force_single_session'
+            default: false
+            trigger:
+                action: show
+                field: config[enabled]
+                condition: checked
+        tests[sensitive_files_checker_section]:
+            label: 'wobqqq.fortify::lang.fields.sensitive_files_checker'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            comment: 'wobqqq.fortify::lang.comments.sensitive_files_checker_section'
+            commentHtml: true
+        tests[sensitive_files_checker_urls]:
+            label: 'wobqqq.fortify::lang.fields.urls'
+            type: datatable
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            adding: true
+            deleting: true
+            searching: false
+            recordsPerPage: 20
+            commentAbove: 'wobqqq.fortify::lang.comments.sensitive_files_checker_urls'
+            comment: 'wobqqq.fortify::lang.comments.sensitive_files_checker_urls_example'
+            commentHtml: true
+            columns:
+                url:
+                    type: string
+                    title: 'wobqqq.fortify::lang.fields.url'
+        tests[sensitive_files_checker_paths]:
+            label: 'wobqqq.fortify::lang.fields.paths'
+            type: datatable
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            adding: true
+            deleting: true
+            searching: false
+            recordsPerPage: 20
+            comment: 'wobqqq.fortify::lang.comments.sensitive_files_checker_paths_example'
+            commentHtml: true
+            columns:
+                path:
+                    type: string
+                    title: 'wobqqq.fortify::lang.fields.path'
+        tests[sensitive_tcp_ports_checker_section]:
+            label: 'wobqqq.fortify::lang.fields.sensitive_tcp_ports_checker'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            comment: 'wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_section'
+            commentHtml: true
+        tests[sensitive_tcp_ports_checker_ips]:
+            label: 'wobqqq.fortify::lang.fields.ips'
+            type: datatable
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            adding: true
+            deleting: true
+            searching: false
+            commentAbove: 'wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_ips'
+            comment: 'wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_ips_example'
+            commentHtml: true
+            columns:
+                ip:
+                    type: string
+                    title: 'wobqqq.fortify::lang.fields.ip'
+                ports:
+                    type: string
+                    title: 'wobqqq.fortify::lang.fields.ports'
+        tests[ssl_certificate_checker_section]:
+            label: 'wobqqq.fortify::lang.fields.ssl_certificate_checker'
+            type: section
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            comment: 'wobqqq.fortify::lang.comments.ssl_certificate_checker_section'
+            commentHtml: true
+        tests[ssl_certificate_checker_hosts]:
+            label: 'wobqqq.fortify::lang.fields.hosts'
+            type: datatable
+            span: full
+            tab: 'wobqqq.fortify::lang.tabs.tests'
+            adding: true
+            deleting: true
+            searching: false
+            commentAbove: 'wobqqq.fortify::lang.comments.ssl_certificate_checker_hosts'
+            comment: 'wobqqq.fortify::lang.comments.ssl_certificate_checker_hosts_example'
+            commentHtml: true
+            columns:
+                host:
+                    type: string
+                    title: 'wobqqq.fortify::lang.fields.host'
+                ports:
+                    type: string
+                    title: 'wobqqq.fortify::lang.fields.ports'

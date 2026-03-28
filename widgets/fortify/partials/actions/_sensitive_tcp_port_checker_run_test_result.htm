@@ -1,0 +1,61 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="icon-info-circle"></i> <?= e(trans('wobqqq.fortify::lang.fields.sensitive_tcp_ports_checker_report')) ?>
+    </h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body pb-3">
+    <?php if($numberOfPublicPorts === 0) { ?>
+        <p class="text-success"><?= trans('wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_test_success') ?></p>
+    <?php } else { ?>
+        <p class="text-danger"><?= trans('wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_test_failed', ['number' => $numberOfPublicPorts]) ?></p>
+    <?php } ?>
+
+    <div class="control-list">
+        <table class="table data">
+            <thead>
+            <tr>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.ip')) ?></span></th>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.port')) ?></span></th>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.status')) ?></span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach($ports as $port) { ?>
+            <tr>
+                <td>
+                    <?php if($port->isPositive) { ?>
+                    <span class="text-success">
+                        <?= $port->ip ?>
+                    </span>
+                    <?php } else { ?>
+                    <span class="text-danger">
+                        <?= (strlen($port->ip) > 40 ? substr($port->ip, 0, 40) . '...' : $port->ip) ?>
+                    </span>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if($port->isPositive) { ?>
+                        <span class="text-success"><?= $port->port ?></span>
+                    <?php } else { ?>
+                        <span class="text-danger" ><?= $port->port ?></span>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if($port->isPositive) { ?>
+                    <span class="text-success"><?= $port->status ?></span>
+                    <?php } else { ?>
+                    <span class="text-danger" ><?= $port->status ?></span>
+                    <?php } ?>
+                </td>
+            </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

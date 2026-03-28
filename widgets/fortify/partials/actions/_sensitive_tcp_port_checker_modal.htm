@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="icon-info-circle"></i> <?= e(trans('wobqqq.fortify::lang.fields.sensitive_tcp_ports_checker')) ?>
+    </h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body">
+    <p><?= trans('wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_section') ?></p>
+    <p>
+        <a
+            class="<?php if(empty($sensitiveTcpPortCheckerDtoList)) { ?>text-danger<?php } ?>"
+            href="<?= \Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests') ?>"
+        >
+            <?php if(!empty($sensitiveTcpPortCheckerDtoList)) { ?>
+                <?= trans('wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_ips') ?>
+            <?php } else { ?>
+                <?= trans('wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_empty_ips') ?>
+            <?php } ?>
+        </a>
+    </p>
+</div>
+<div class="modal-footer">
+    <?php if(!empty($sensitiveTcpPortCheckerDtoList)) { ?>
+        <?php foreach($sensitiveTcpPortCheckerDtoList as $sensitiveTcpPortCheckerDto) { ?>
+            <button
+                type="button"
+                class="fortify-button fortify-action btn btn-info"
+                data-request-data="{ _dash_definition: 'system', ip: '<?= $sensitiveTcpPortCheckerDto->ip ?>', action: '<?= \Wobqqq\Fortify\Enums\ButtonAction::SENSITIVE_TCP_PORTS_CHECKER_RUN_TEST->value ?>' }"
+                data-dismiss="popup"
+                data-control="popup"
+                data-handler="onFortifyAction"
+            >
+                <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= $sensitiveTcpPortCheckerDto->ip ?>)
+            </button>
+        <?php } ?>
+    <?php } ?>
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

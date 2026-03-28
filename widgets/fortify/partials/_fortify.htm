@@ -1,0 +1,64 @@
+<?php
+use \wobqqq\Fortify\Enums\WidgetItemColor as Color;
+?>
+<div class="report-widget">
+    <h3>
+        <i class="icon-shield"></i> <?= e(__($this->property('title'))) ?>
+    </h3>
+
+    <?php if (!isset($error)): ?>
+        <?php foreach ($groups as $group) { ?>
+            <div class="header">
+                <h3>
+                    <?php if(!empty($group->icon)) { ?><i class="<?= $group->icon ?>"></i><?php } ?>
+                    <?= e(trans($group->name)) ?>
+                </h3>
+            </div>
+            <div class="control-status-list mb-5">
+                <?php if (!empty($group->list)) { ?>
+                    <ul>
+                        <?php foreach ($group->list as $item) { ?>
+                            <li>
+                                <?php if(!empty($item->icon)) { ?>
+                                    <span class="status-icon <?php if($item->color === Color::SUCCESS) { ?>success<?php } elseif($item->color === Color::WARNING) { ?>warning<?php } elseif($item->color === Color::DANGER) { ?>danger<?php } elseif($item->color === Color::INFO) { ?>info<?php } ?>">
+                                        <i class="<?= $item->icon ?>"></i>
+                                    </span>
+                                <?php } ?>
+                                <span class="status-text <?php if($item->color === Color::SUCCESS) { ?>success<?php } elseif($item->color === Color::WARNING) { ?>warning<?php } elseif($item->color === Color::DANGER) { ?>danger<?php } elseif($item->color === Color::INFO) { ?>info<?php } ?>">
+                                    <?= trans($item->name) ?>
+                                </span>
+                                <?php if (!empty($item->buttons)) { ?>
+                                    <?php foreach ($item->buttons as $button) { ?>
+                                        <?php if($button instanceof \Wobqqq\Fortify\Dto\WidgetItemLinkDto) { ?>
+                                            <a
+                                                <?php if (!empty($button->target)) { ?>target="<?= $button->target ?>"<?php } ?>
+                                                href="<?= $button->link ?>"
+                                                class="me-2 status-label btn btn-sm btn-outline-<?php if($item->color === Color::SUCCESS) { ?>success<?php } elseif($item->color === Color::WARNING) { ?>warning<?php } elseif($item->color === Color::DANGER) { ?>danger<?php } elseif($item->color === Color::INFO) { ?>info<?php } else { ?>secondary<?php } ?>"
+                                            >
+                                                <?php if(!empty($button->icon)) { ?><i class="<?= $button->icon ?>"></i><?php } ?><?= e(trans($button->name)) ?>
+                                            </a>
+                                        <?php } else { ?>
+                                            <button
+                                                type="button"
+                                                data-request-data="{ _dash_definition: 'system', action: '<?= $button->action ?>' }"
+                                                data-control="popup"
+                                                data-handler="onFortifyAction"
+                                                class="me-2 fortify-button fortify-open-modal fortify-action status-label btn btn-sm btn-outline-<?php if($item->color === Color::SUCCESS) { ?>success<?php } elseif($item->color === Color::WARNING) { ?>warning<?php } elseif($item->color === Color::DANGER) { ?>danger<?php } elseif($item->color === Color::INFO) { ?>info<?php } else { ?>secondary<?php } ?>"
+                                            >
+                                                <?php if(!empty($button->icon)) { ?><i class="<?= $button->icon ?>"></i><?php } ?><?= e(trans($button->name)) ?>
+                                            </button>
+                                        <?php } ?>
+                                    <?php } ?>
+                                <?php } ?>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                <?php } ?>
+            </div>
+        <?php } ?>
+    <?php else: ?>
+        <div class="callout callout-warning">
+            <div class="content py-3"><?= e($error) ?></div>
+        </div>
+    <?php endif ?>
+</div>

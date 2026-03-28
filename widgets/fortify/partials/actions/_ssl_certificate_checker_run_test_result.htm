@@ -1,0 +1,65 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="icon-info-circle"></i> <?= e(trans('wobqqq.fortify::lang.fields.ssl_certificate_checker_report')) ?>
+    </h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body pb-3">
+    <?php if($numberOfHostsWithoutSsl === 0) { ?>
+        <p class="text-success"><?= trans('wobqqq.fortify::lang.comments.ssl_certificate_checker_test_success') ?></p>
+    <?php } else { ?>
+        <p class="text-danger"><?= trans('wobqqq.fortify::lang.comments.ssl_certificate_checker_test_failed', ['number' => $numberOfHostsWithoutSsl]) ?></p>
+    <?php } ?>
+
+    <div class="control-list">
+        <table class="table data">
+            <thead>
+            <tr>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.host')) ?></span></th>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.port')) ?></span></th>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.issued_on')) ?></span></th>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.expires_on')) ?></span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach($ports as $port) { ?>
+            <tr>
+                <td>
+                    <?php if($port->isPositive) { ?>
+                    <span class="text-success">
+                        <?= $port->host ?>
+                    </span>
+                    <?php } else { ?>
+                    <span class="text-danger">
+                        <?= (strlen($port->host) > 40 ? substr($port->host, 0, 40) . '...' : $port->host) ?>
+                    </span>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if($port->isPositive) { ?>
+                        <span class="text-success"><?= $port->port ?></span>
+                    <?php } else { ?>
+                        <span class="text-danger" ><?= $port->port ?></span>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if($port->isPositive && !empty($port->issuedOn)) { ?>
+                        <span class="text-success"><?= $port->issuedOn->toDateString() ?></span>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if($port->isPositive && !empty($port->expiresOn)) { ?>
+                        <span class="text-success"><?= $port->expiresOn->toDateString() ?></span>
+                    <?php } ?>
+                </td>
+            </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

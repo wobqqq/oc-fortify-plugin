@@ -1,0 +1,21 @@
+<div class="alert alert-info text-center p-4">
+    <?php if(\System\Classes\PluginManager::instance()->hasPlugin('wobqqq.fortifyipblocker')) { ?>
+    <?php if(\System\Classes\PluginManager::instance()->isDisabled('Wobqqq.FortifyIpBlocker')) { ?>
+    <p class="mb-3">
+        <?= e(trans('wobqqq.fortify::lang.comments.plugin_is_not_enabled')) ?>
+    </p>
+
+    <a href="<?= \Backend::url('system/updates/manage') ?>" class="btn btn-success">
+        <?= e(trans('wobqqq.fortify::lang.buttons.enable_plugin')) ?>
+    </a>
+    <?php } ?>
+    <?php } else { ?>
+    <p class="mb-3">
+        <?= e(trans('wobqqq.fortify::lang.comments.plugin_is_not_installed')) ?>
+    </p>
+
+    <a href="https://octobercms.com/plugin/wobqqq-fortifyipblocker" target="_blank" class="btn btn-success">
+        <?= e(trans('wobqqq.fortify::lang.buttons.install_plugin')) ?>
+    </a>
+    <?php } ?>
+</div>

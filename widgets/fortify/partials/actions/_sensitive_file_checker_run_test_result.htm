@@ -1,0 +1,53 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="icon-info-circle"></i> <?= e(trans('wobqqq.fortify::lang.fields.sensitive_files_checker_report')) ?>
+    </h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body pb-3">
+    <?php if($numberOfPublicUrls === 0) { ?>
+        <p class="text-success"><?= trans('wobqqq.fortify::lang.comments.sensitive_files_checker_test_success') ?></p>
+    <?php } else { ?>
+        <p class="text-danger"><?= trans('wobqqq.fortify::lang.comments.sensitive_files_checker_test_failed', ['number' => $numberOfPublicUrls]) ?></p>
+    <?php } ?>
+
+    <div class="control-list">
+        <table class="table data">
+            <thead>
+            <tr>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.url')) ?></span></th>
+                <th><span><?= e(trans('wobqqq.fortify::lang.fields.status')) ?></span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach($urls as $url) { ?>
+            <tr>
+                <td>
+                    <?php if($url->isPositive) { ?>
+                    <span class="text-success">
+                        <?= $url->url ?>
+                    </span>
+                    <?php } else { ?>
+                    <a class="text-danger" href="<?= $url->url ?>" target="_blank">
+                        <?= (strlen($url->url) > 40 ? substr($url->url, 0, 40) . '...' : $url->url) ?>
+                    </a>
+                    <?php } ?>
+                </td>
+                <td>
+                    <?php if($url->isPositive) { ?>
+                        <span class="text-success"><?= $url->status ?></span>
+                    <?php } else { ?>
+                        <span class="text-danger" ><?= $url->status ?></span>
+                    <?php } ?>
+                </td>
+            </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

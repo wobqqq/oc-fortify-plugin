@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="icon-info-circle"></i> <?= e(trans('wobqqq.fortify::lang.fields.ssl_certificate_checker')) ?>
+    </h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body">
+    <p><?= trans('wobqqq.fortify::lang.comments.ssl_certificate_checker_section') ?></p>
+    <p>
+        <?php if($isOpenssl === true) { ?>
+            <a
+                class="<?php if(empty($sslCertificateCheckerDtoList)) { ?>text-danger<?php } ?>"
+                href="<?= \Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests') ?>"
+            >
+                <?php if(empty($sslCertificateCheckerDtoList)) { ?>
+                    <?= trans('wobqqq.fortify::lang.comments.ssl_certificate_checker_empty_hosts') ?>
+                <?php } else { ?>
+                    <?= trans('wobqqq.fortify::lang.comments.ssl_certificate_checker_hosts') ?>
+                <?php } ?>
+            </a>
+        <?php } else { ?>
+            <span class="text-danger"><?= trans('wobqqq.fortify::lang.errors.openssl_is_not_installed') ?></span>
+        <?php } ?>
+    </p>
+</div>
+<div class="modal-footer">
+    <?php if($isOpenssl === true && !empty($sslCertificateCheckerDtoList)) { ?>
+        <?php foreach ($sslCertificateCheckerDtoList as $sslCertificateCheckerDto) { ?>
+        <button
+            type="button"
+            class="fortify-button fortify-action btn btn-info"
+            data-request-data="{ _dash_definition: 'system', host: '<?= $sslCertificateCheckerDto->host ?>', action: '<?= \Wobqqq\Fortify\Enums\ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST->value ?>' }"
+            data-dismiss="popup"
+            data-control="popup"
+            data-handler="onFortifyAction"
+        >
+            <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= $sslCertificateCheckerDto->host ?>)
+        </button>
+        <?php } ?>
+    <?php } ?>
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

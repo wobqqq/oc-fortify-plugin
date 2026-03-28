@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="icon-info-circle"></i> <?= e(trans('wobqqq.fortify::lang.fields.sensitive_files_checker')) ?>
+    </h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body">
+    <p><?= trans('wobqqq.fortify::lang.comments.sensitive_files_checker_section') ?></p>
+    <p>
+        <a
+            class="<?php if(empty($sensitiveFileCheckerDto->urls) || empty($sensitiveFileCheckerDto->paths)) { ?>text-danger<?php } ?>"
+            href="<?= \Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests') ?>"
+        >
+            <?php if(!empty($sensitiveFileCheckerDto->urls) && !empty($sensitiveFileCheckerDto->paths)) { ?>
+                <?= trans('wobqqq.fortify::lang.comments.sensitive_files_checker_urls') ?>
+            <?php } else { ?>
+                <?= trans('wobqqq.fortify::lang.comments.sensitive_files_checker_empty_urls') ?>
+            <?php } ?>
+        </a>
+    </p>
+</div>
+<div class="modal-footer">
+    <?php if(!empty($sensitiveFileCheckerDto->urls) && !empty($sensitiveFileCheckerDto->paths)) { ?>
+        <?php foreach($sensitiveFileCheckerDto->urls as $url) { ?>
+            <button
+                type="button"
+                class="fortify-button fortify-action btn btn-info"
+                data-request-data="{ _dash_definition: 'system', url: '<?= $url ?>', action: '<?= \Wobqqq\Fortify\Enums\ButtonAction::SENSITIVE_FILES_CHECKER_RUN_TEST->value ?>' }"
+                data-dismiss="popup"
+                data-control="popup"
+                data-handler="onFortifyAction"
+            >
+                <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= $url ?>)
+            </button>
+        <?php } ?>
+    <?php } ?>
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

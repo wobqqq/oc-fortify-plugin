@@ -1,0 +1,12 @@
+<div class="modal-header">
+    <h5 class="modal-title"><?= e(trans('wobqqq.fortify::lang.errors.error')) ?></h5>
+    <button type="button" class="btn-close fortify-button close-fortify-widget-modal" data-dismiss="popup"></button>
+</div>
+<div class="modal-body">
+    <p><?= trans('wobqqq.fortify::lang.errors.widget_action_error', ['error' => $error]) ?></p>
+</div>
+<div class="modal-footer">
+    <button type="button" data-dismiss="popup" class="fortify-button close-fortify-widget-modal btn btn-default">
+        <?= e(trans('backend::lang.form.cancel')) ?>
+    </button>
+</div>

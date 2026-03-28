@@ -1,0 +1,10 @@
+plugin:
+    name: 'Fortify'
+    description: 'wobqqq.fortify::lang.messages.fortify_description'
+    author: wobqqq
+    icon: icon-shield
+    homepage: 'https://github.com/wobqqq/oc-fortify-plugin'
+permissions:
+    app-fortify:
+        label: 'wobqqq.fortify::lang.permissions.app_fortify'
+        tab: 'wobqqq.fortify::lang.tabs.fortify'
