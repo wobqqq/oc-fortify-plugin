@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Wobqqq\Fortify\Listeners;
 
 use Backend\Models\User;
-use October\Rain\Events\Dispatcher;
 use Wobqqq\Fortify\Cache\BackendUserCache;
 
 final readonly class BackendUserListener
@@ -14,7 +13,7 @@ final readonly class BackendUserListener
     {
     }
 
-    public function subscribe(Dispatcher $event): void
+    public function subscribe(): void
     {
         User::extend(function (User $user) {
             $user->bindEvent('model.afterSave', function () {
