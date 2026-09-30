@@ -49,6 +49,15 @@ it('lets the modules offer their own pages', function (): void {
         ->and((new Fortify())->getSessionSameSiteOptions())->toBe(['lax' => 'lax', 'strict' => 'strict']);
 });
 
+it('saves the defaults of a site served from an IP address or localhost', function (string $url): void {
+    config(['app.url' => $url]);
+    Fortify::clearInternalCache();
+
+    $settings = Fortify::instance();
+
+    expect($settings->validate())->toBeTrue();
+})->with(['http://127.0.0.1:8080', 'http://localhost', 'https://www.example.com']);
+
 it('validates the password expiration as a number of days', function (mixed $days, bool $passes): void {
     $validator = fortifyValidation([
         'config' => ['password_policy_min_length' => 12, 'session_lifetime' => 30, 'password_policy_expire_after_days' => $days],
@@ -81,4 +90,9 @@ it('only accepts web addresses, IP addresses and host names for the checks', fun
     ['tests.sensitive_tcp_ports_checker_ips.0.ports', '22;rm -rf', false],
     ['tests.ssl_certificate_checker_hosts.0.host', 'mail.example.com', true],
     ['tests.ssl_certificate_checker_hosts.0.host', 'example.com/../', false],
+    ['tests.ssl_certificate_checker_hosts.0.host', 'localhost', true],
+    ['tests.ssl_certificate_checker_hosts.0.host', '127.0.0.1', true],
+    ['tests.ssl_certificate_checker_hosts.0.host', 'staging-01.example.co.uk', true],
+    ['tests.ssl_certificate_checker_hosts.0.host', '-bad.example.com', false],
+    ['tests.ssl_certificate_checker_hosts.0.host', 'example.com; rm', false],
 ]);

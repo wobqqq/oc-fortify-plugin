@@ -60,7 +60,7 @@ class Fortify extends SettingModel
         'tests.ssl_certificate_checker_hosts.*.host' => [
             'nullable',
             'max:100',
-            'regex:/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}(:\d{1,5})?$/i',
+            'regex:/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*(?::\d{1,5})?$/i',
         ],
         'tests.ssl_certificate_checker_hosts.*.ports' => 'nullable|string|max:100|regex:/^\d+(,\d+)*$/',
         'tests.ssl_certificate_checker_hosts' => 'nullable|array|max:5',
