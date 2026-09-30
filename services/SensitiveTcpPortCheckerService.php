@@ -63,7 +63,7 @@ final readonly class SensitiveTcpPortCheckerService
             );
 
             foreach ($responses as $port => $status) {
-                $isPositive = $status !== 'opened';
+                $isPositive = $status !== SensitiveTcpPortCheckerClient::OPENED;
                 $key = sprintf('%s-%s-%s', $status, $port, $fortifySensitiveTcpPortCheckerDto->ip);
                 $ports[$key] = FortifyTransformer::sensitiveTcpPortCheckerTestResultDto(
                     $fortifySensitiveTcpPortCheckerDto->ip,

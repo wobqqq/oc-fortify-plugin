@@ -26,26 +26,26 @@
                 <td>
                     <?php if($port->isPositive) { ?>
                     <span class="text-success">
-                        <?= $port->ip ?>
+                        <?= e($port->ip) ?>
                     </span>
                     <?php } else { ?>
                     <span class="text-danger">
-                        <?= (strlen($port->ip) > 40 ? substr($port->ip, 0, 40) . '...' : $port->ip) ?>
+                        <?= e(\Str::limit($port->ip, 40)) ?>
                     </span>
                     <?php } ?>
                 </td>
                 <td>
                     <?php if($port->isPositive) { ?>
-                        <span class="text-success"><?= $port->port ?></span>
+                        <span class="text-success"><?= e($port->port) ?></span>
                     <?php } else { ?>
-                        <span class="text-danger" ><?= $port->port ?></span>
+                        <span class="text-danger" ><?= e($port->port) ?></span>
                     <?php } ?>
                 </td>
                 <td>
                     <?php if($port->isPositive) { ?>
-                    <span class="text-success"><?= $port->status ?></span>
+                    <span class="text-success"><?= e($port->status) ?></span>
                     <?php } else { ?>
-                    <span class="text-danger" ><?= $port->status ?></span>
+                    <span class="text-danger" ><?= e($port->status) ?></span>
                     <?php } ?>
                 </td>
             </tr>

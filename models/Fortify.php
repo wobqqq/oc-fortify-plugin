@@ -16,34 +16,17 @@ use Wobqqq\Fortify\Services\SensitiveSslCertificateCheckerService;
 use Wobqqq\Fortify\Services\SensitiveTcpPortCheckerService;
 
 /**
- * Wobqqq\Fortify\Models\Fortify
+ * The settings record every Fortify module shares: each one keeps its values under its own key.
  *
  * @property int $id
  * @property string|null $item
- * @property array|null $value
  * @property int|null $site_id
  * @property int|null $site_root_id
- * @method static \October\Rain\Database\Builder|Fortify addWhereExistsQuery($query, $boolean = 'and', $not = false)
- * @method static \October\Rain\Database\Collection<int, static> all($columns = ['*'])
- * @method static \October\Rain\Database\Collection<int, static> get($columns = ['*'])
- * @method static \October\Rain\Database\Builder|Fortify lists($column, $key = null)
- * @method static \October\Rain\Database\Builder|Fortify newModelQuery()
- * @method static \October\Rain\Database\Builder|Fortify newQuery()
- * @method static \October\Rain\Database\Builder|Fortify orSearchWhere($term, $columns = [], $mode = 'all')
- * @method static \October\Rain\Database\Builder|Fortify orSearchWhereRelation($term, $relation, $columns = [], $mode = 'all')
- * @method static \October\Rain\Database\Builder|Fortify paginateAtPage($perPage, $currentPage)
- * @method static \October\Rain\Database\Builder|Fortify paginateCustom($perPage, $pageName)
- * @method static \October\Rain\Database\Builder|Fortify query()
- * @method static \October\Rain\Database\Builder|Fortify searchWhere($term, $columns = [], $mode = 'all')
- * @method static \October\Rain\Database\Builder|Fortify searchWhereRelation($term, $relation, $columns = [], $mode = 'all')
- * @method static \October\Rain\Database\Builder|Fortify simplePaginateAtPage($perPage, $currentPage)
- * @method static \October\Rain\Database\Builder|Fortify simplePaginateCustom($perPage, $pageName)
- * @method static \October\Rain\Database\Builder|Fortify whereId($value)
- * @method static \October\Rain\Database\Builder|Fortify whereItem($value)
- * @method static \October\Rain\Database\Builder|Fortify whereSiteId($value)
- * @method static \October\Rain\Database\Builder|Fortify whereSiteRootId($value)
- * @method static \October\Rain\Database\Builder|Fortify whereValue($value)
- * @mixin \Eloquent
+ * @property array<string, mixed>|null $config
+ * @property array<string, mixed>|null $tests
+ * @property array<string, mixed>|null $ip_firewall
+ * @property array<string, mixed>|null $csp
+ * @property array<string, mixed>|null $input_sanitizer
  */
 class Fortify extends SettingModel
 {
@@ -66,11 +49,12 @@ class Fortify extends SettingModel
     public array $rules = [
         'config.password_policy_min_length' => 'required|integer|min:4|max:128',
         'config.session_lifetime' => 'required|integer|min:1|max:1000',
-        'tests.sensitive_files_checker_urls.*.url' => 'nullable|max:50|url',
+        'config.password_policy_expire_days' => 'nullable|integer|min:0|max:3650',
+        'tests.sensitive_files_checker_urls.*.url' => 'nullable|max:255|url:http,https',
         'tests.sensitive_files_checker_urls' => 'nullable|array|max:100',
         'tests.sensitive_files_checker_paths.*.path' => 'nullable|max:150|string',
         'tests.sensitive_files_checker_paths' => 'nullable|array|max:100',
-        'tests.sensitive_tcp_ports_checker_ips.*.ip' => 'nullable|regex:/^[0-9a-fA-F\.:]+(\/\d{1,3})?$/|max:50',
+        'tests.sensitive_tcp_ports_checker_ips.*.ip' => 'nullable|ip|max:50',
         'tests.sensitive_tcp_ports_checker_ips.*.ports' => 'nullable|string|max:100|regex:/^\d+(,\d+)*$/',
         'tests.sensitive_tcp_ports_checker_ips' => 'nullable|array|max:5',
         'tests.ssl_certificate_checker_hosts.*.host' => [
@@ -123,13 +107,11 @@ class Fortify extends SettingModel
             'password_policy_require_lowercase' => Config::get('backend.password_policy.require_lowercase'),
             'password_policy_require_number' => Config::get('backend.password_policy.require_number'),
             'password_policy_require_nonalpha' => Config::get('backend.password_policy.require_nonalpha'),
-            'password_policy_expire_days' => Config::get('backend.password_policy.expire_days'),
+            'password_policy_expire_days' => is_numeric($expireDays = Config::get('backend.password_policy.expire_days')) ? (int)$expireDays : 0,
             'password_policy_require_uppercase' => Config::get('backend.password_policy.require_uppercase'),
             'backend_force_secure' => Config::get('backend.force_secure'),
             'backend_force_single_session' => Config::get('backend.force_single_session'),
         ];
-        /** @noinspection PhpUndefinedFieldInspection */
-        /** @phpstan-ignore-next-line */
         $this->config = $config;
 
         /** @var SensitiveFileCheckerService $sensitiveFileCheckerService */
@@ -144,8 +126,6 @@ class Fortify extends SettingModel
             'sensitive_tcp_ports_checker_ips' => $sensitiveTcpPortCheckerService->generateDefaultSettingsData(),
             'ssl_certificate_checker_hosts' => $sensitiveSslCertificateCheckerService->generateDefaultSettingsData(),
         ];
-        /** @noinspection PhpUndefinedFieldInspection */
-        /** @phpstan-ignore-next-line */
         $this->tests = $tests;
 
         /** @phpstan-ignore-next-line */

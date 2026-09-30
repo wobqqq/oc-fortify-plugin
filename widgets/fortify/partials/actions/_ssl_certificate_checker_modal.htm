@@ -10,7 +10,7 @@
         <?php if($isOpenssl === true) { ?>
             <a
                 class="<?php if(empty($sslCertificateCheckerDtoList)) { ?>text-danger<?php } ?>"
-                href="<?= \Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests') ?>"
+                href="<?= e(\Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests')) ?>"
             >
                 <?php if(empty($sslCertificateCheckerDtoList)) { ?>
                     <?= trans('wobqqq.fortify::lang.comments.ssl_certificate_checker_empty_hosts') ?>
@@ -29,12 +29,12 @@
         <button
             type="button"
             class="fortify-button fortify-action btn btn-info"
-            data-request-data="{ _dash_definition: 'system', host: '<?= $sslCertificateCheckerDto->host ?>', action: '<?= \Wobqqq\Fortify\Enums\ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST->value ?>' }"
+            data-request-data="<?= e(json_encode(['_dash_definition' => 'system', 'host' => $sslCertificateCheckerDto->host, 'action' => \Wobqqq\Fortify\Enums\ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST->value], JSON_THROW_ON_ERROR)) ?>"
             data-dismiss="popup"
             data-control="popup"
             data-handler="onFortifyAction"
         >
-            <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= $sslCertificateCheckerDto->host ?>)
+            <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= e($sslCertificateCheckerDto->host) ?>)
         </button>
         <?php } ?>
     <?php } ?>

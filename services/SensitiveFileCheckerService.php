@@ -85,12 +85,7 @@ final readonly class SensitiveFileCheckerService
      */
     public function generateDefaultPathsSettingsData(): array
     {
-        /** @var array<int, array<string, string>> $sensitiveFilesCheckerPaths */
-        $sensitiveFilesCheckerPaths = array_map(function (string $path) {
-            return ['path' => $path];
-        }, SensitiveFileCheckerService::PATHS);
-
-        return $sensitiveFilesCheckerPaths;
+        return array_map(static fn (string $path): array => ['path' => $path], self::PATHS);
     }
 
     /**
@@ -100,13 +95,14 @@ final readonly class SensitiveFileCheckerService
     {
         $fortifySensitiveFileCheckerDto = SensitiveFileCheckerDtoInstance::instance()->get();
 
-        if (!in_array($url, $fortifySensitiveFileCheckerDto->urls)) {
+        if (!in_array($url, $fortifySensitiveFileCheckerDto->urls, true)) {
             return [[], 0];
         }
 
-        $urls = array_map(function (string $path) use ($url) {
-            return sprintf('%s/%s', $url, $path);
-        }, $fortifySensitiveFileCheckerDto->paths);
+        $urls = array_values(array_map(
+            static fn (string $path): string => sprintf('%s/%s', $url, $path),
+            $fortifySensitiveFileCheckerDto->paths,
+        ));
 
         $responses = $this->sensitiveFileCheckerClient->request($urls);
 
@@ -114,10 +110,10 @@ final readonly class SensitiveFileCheckerService
 
         $numberOfPublicUrls = 0;
 
-        foreach ($responses as $url => $status) {
-            $isPositive = !(($status === 'error' || $status === 200));
+        foreach ($responses as $checkedUrl => $status) {
+            $isPositive = $status !== 'error' && $status !== 200;
             $urls[] = FortifyTransformer::sensitiveFileCheckerTestResultDto(
-                $url,
+                $checkedUrl,
                 (string)$status,
                 $isPositive,
             );

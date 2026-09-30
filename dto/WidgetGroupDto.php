@@ -8,7 +8,7 @@ final readonly class WidgetGroupDto
 {
     public function __construct(
         public string $name,
-        /** @var array<int, mixed> $list */
+        /** @var array<int, WidgetGroupItemDto> $list */
         public array $list = [],
         public ?string $icon = null,
     ) {

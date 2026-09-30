@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Wobqqq\Fortify\Widgets;
 
 use Backend\Classes\ReportWidgetBase;
-use Exception;
+use Backend\Facades\BackendAuth;
 use Input;
+use InvalidArgumentException;
+use Throwable;
+use Wobqqq\Fortify\Enums\ButtonAction;
+use Wobqqq\Fortify\Enums\Permission;
 use Wobqqq\Fortify\Instances\SensitiveFileCheckerDtoInstance;
 use Wobqqq\Fortify\Instances\SensitiveTcpPortCheckerDtoListInstance;
 use Wobqqq\Fortify\Instances\SslCertificateCheckerDtoListInstance;
@@ -36,188 +40,132 @@ class Fortify extends ReportWidgetBase
         ];
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
     public function render(): mixed
     {
         /** @var WidgetService $widgetService */
         $widgetService = app(WidgetService::class);
-        $groups = $widgetService->getWidgetGroups();
 
-        /** @var mixed $render */
-        $render =  $this->makePartial('fortify', ['groups' => $groups]);
-
-        return $render;
+        return $this->makePartial('fortify', ['groups' => $widgetService->getWidgetGroups()]);
     }
 
-    /**
-     * @throws \SystemException
-     */
     public function onFortifyAction(): mixed
     {
         try {
+            if (!BackendAuth::userHasAccess(Permission::FORTIFY->value)) {
+                /** @var string $message */
+                $message = trans('wobqqq.fortify::lang.errors.access_denied_message');
+
+                return $this->errorPartial($message);
+            }
+
             /** @var string|null $action */
             $action = Input::get('action');
 
-            if (empty($action)) {
-                throw new Exception('Action cannot be empty.');
-            }
-
-            if (!method_exists($this, $action)) {
-                throw new Exception('Action does not exist.');
-            }
-
-            return $this->$action();
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
+            return match (ButtonAction::tryFrom((string)$action)) {
+                ButtonAction::SENSITIVE_FILES_CHECKER_OPEN_MODAL => $this->sensitiveFilesCheckerOpenModal(),
+                ButtonAction::SENSITIVE_FILES_CHECKER_RUN_TEST => $this->sensitiveFilesCheckerRunTest(),
+                ButtonAction::SENSITIVE_TCP_PORTS_CHECKER_OPEN_MODAL => $this->sensitiveTcpPortsCheckerOpenModal(),
+                ButtonAction::SENSITIVE_TCP_PORTS_CHECKER_RUN_TEST => $this->sensitiveTcpPortsCheckerRunTest(),
+                ButtonAction::SSL_CERTIFICATE_CHECKER_OPEN_MODAL => $this->sslCertificateCheckerOpenModal(),
+                ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST => $this->sslCertificateCheckerRunTest(),
+                null => $this->errorPartial('Action does not exist.'),
+            };
+        } catch (Throwable $e) {
+            return $this->errorPartial($e->getMessage());
         }
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
-    private function sensitiveFilesCheckerOpenModalService(): mixed
+    private function sensitiveFilesCheckerOpenModal(): mixed
     {
-        try {
-            $fortifySensitiveFileCheckerDto = SensitiveFileCheckerDtoInstance::instance()->get();
-
-            return $this->makePartial(
-                'actions/sensitive_file_checker_modal',
-                ['sensitiveFileCheckerDto' => $fortifySensitiveFileCheckerDto],
-            );
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
-        }
+        return $this->makePartial(
+            'actions/sensitive_file_checker_modal',
+            ['sensitiveFileCheckerDto' => SensitiveFileCheckerDtoInstance::instance()->get()],
+        );
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
-    private function sensitiveFilesCheckerRunTestService(): mixed
+    private function sensitiveFilesCheckerRunTest(): mixed
     {
-        try {
-            /** @var string|null $url */
-            $url = Input::get('url');
+        $url = $this->requiredInput('url');
 
-            if (empty($url)) {
-                throw new Exception('URL cannot be empty.');
-            }
+        /** @var SensitiveFileCheckerService $sensitiveFileCheckerService */
+        $sensitiveFileCheckerService = app(SensitiveFileCheckerService::class);
+        [$urls, $numberOfPublicUrls] = $sensitiveFileCheckerService->check($url);
 
-            /** @var SensitiveFileCheckerService $sensitiveFileCheckerService */
-            $sensitiveFileCheckerService = app(SensitiveFileCheckerService::class);
-            [$urls, $numberOfPublicUrls] = $sensitiveFileCheckerService->check($url);
-
-            return $this->makePartial(
-                'actions/sensitive_file_checker_run_test_result',
-                [
-                    'urls' => $urls,
-                    'numberOfPublicUrls' => $numberOfPublicUrls,
-                ],
-            );
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
-        }
+        return $this->makePartial(
+            'actions/sensitive_file_checker_run_test_result',
+            [
+                'urls' => $urls,
+                'numberOfPublicUrls' => $numberOfPublicUrls,
+            ],
+        );
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
-    private function sensitiveTcpPortsCheckerOpenModalService(): mixed
+    private function sensitiveTcpPortsCheckerOpenModal(): mixed
     {
-        try {
-            $fortifySensitiveTcpPortCheckerDtoList = SensitiveTcpPortCheckerDtoListInstance::instance()->get();
-
-            return $this->makePartial(
-                'actions/sensitive_tcp_port_checker_modal',
-                ['sensitiveTcpPortCheckerDtoList' => $fortifySensitiveTcpPortCheckerDtoList],
-            );
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
-        }
+        return $this->makePartial(
+            'actions/sensitive_tcp_port_checker_modal',
+            ['sensitiveTcpPortCheckerDtoList' => SensitiveTcpPortCheckerDtoListInstance::instance()->get()],
+        );
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
-    private function sensitiveTcpPortsCheckerRunTestService(): mixed
+    private function sensitiveTcpPortsCheckerRunTest(): mixed
     {
-        try {
-            /** @var string|null $ip */
-            $ip = Input::get('ip');
+        $ip = $this->requiredInput('ip');
 
-            if (empty($ip)) {
-                throw new Exception('IP cannot be empty.');
-            }
+        /** @var SensitiveTcpPortCheckerService $sensitiveTcpPortCheckerService */
+        $sensitiveTcpPortCheckerService = app(SensitiveTcpPortCheckerService::class);
+        [$ports, $numberOfPublicPorts] = $sensitiveTcpPortCheckerService->check($ip);
 
-            /** @var SensitiveTcpPortCheckerService $sensitiveTcpPortCheckerService */
-            $sensitiveTcpPortCheckerService = app(SensitiveTcpPortCheckerService::class);
-            [$ports, $numberOfPublicPorts] = $sensitiveTcpPortCheckerService->check($ip);
-
-            return $this->makePartial(
-                'actions/sensitive_tcp_port_checker_run_test_result',
-                [
-                    'ports' => $ports,
-                    'numberOfPublicPorts' => $numberOfPublicPorts,
-                ],
-            );
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
-        }
+        return $this->makePartial(
+            'actions/sensitive_tcp_port_checker_run_test_result',
+            [
+                'ports' => $ports,
+                'numberOfPublicPorts' => $numberOfPublicPorts,
+            ],
+        );
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
-    private function sslCertificateCheckerOpenModalService(): mixed
+    private function sslCertificateCheckerOpenModal(): mixed
     {
-        try {
-            $sslCertificateCheckerDtoList = SslCertificateCheckerDtoListInstance::instance()->get();
-
-            return $this->makePartial(
-                'actions/ssl_certificate_checker_modal',
-                [
-                    'sslCertificateCheckerDtoList' => $sslCertificateCheckerDtoList,
-                    'isOpenssl' => extension_loaded('openssl'),
-                ],
-            );
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
-        }
+        return $this->makePartial(
+            'actions/ssl_certificate_checker_modal',
+            [
+                'sslCertificateCheckerDtoList' => SslCertificateCheckerDtoListInstance::instance()->get(),
+                'isOpenssl' => extension_loaded('openssl'),
+            ],
+        );
     }
 
-    /**
-     * @return mixed
-     * @throws \SystemException
-     */
-    private function sslCertificateCheckerRunTestService(): mixed
+    private function sslCertificateCheckerRunTest(): mixed
     {
-        try {
-            /** @var string|null $host */
-            $host = Input::get('host');
+        $host = $this->requiredInput('host');
 
-            if (empty($host)) {
-                throw new Exception('Host cannot be empty.');
-            }
+        /** @var SensitiveSslCertificateCheckerService $sensitiveSslCertificateCheckerService */
+        $sensitiveSslCertificateCheckerService = app(SensitiveSslCertificateCheckerService::class);
+        [$ports, $numberOfHostsWithoutSsl] = $sensitiveSslCertificateCheckerService->check($host);
 
-            /** @var SensitiveSslCertificateCheckerService $sensitiveSslCertificateCheckerService */
-            $sensitiveSslCertificateCheckerService = app(SensitiveSslCertificateCheckerService::class);
-            [$ports, $numberOfHostsWithoutSsl] = $sensitiveSslCertificateCheckerService->check($host);
-            return $this->makePartial(
-                'actions/ssl_certificate_checker_run_test_result',
-                [
-                    'ports' => $ports,
-                    'numberOfHostsWithoutSsl' => $numberOfHostsWithoutSsl,
-                ],
-            );
-        } catch (\Throwable $e) {
-            return $this->makePartial('actions/error', ['error' => $e->getMessage()]);
+        return $this->makePartial(
+            'actions/ssl_certificate_checker_run_test_result',
+            [
+                'ports' => $ports,
+                'numberOfHostsWithoutSsl' => $numberOfHostsWithoutSsl,
+            ],
+        );
+    }
+
+    private function requiredInput(string $name): string
+    {
+        $value = Input::get($name);
+
+        if (!is_string($value) || trim($value) === '') {
+            throw new InvalidArgumentException(sprintf('The %s cannot be empty.', $name));
         }
+
+        return trim($value);
+    }
+
+    private function errorPartial(string $error): mixed
+    {
+        return $this->makePartial('actions/error', ['error' => $error]);
     }
 }

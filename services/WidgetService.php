@@ -11,8 +11,9 @@ use Lang;
 use System\Classes\PluginManager;
 use System\Classes\UpdateManager;
 use Wobqqq\Fortify\Cache\BackendUserCache;
+use Wobqqq\Fortify\Dto\WidgetGroupDto;
 use Wobqqq\Fortify\Enums\ButtonAction;
-use Wobqqq\Fortify\Enums\FortifyEvent;
+use Wobqqq\Fortify\Enums\FortifyModule;
 use Wobqqq\Fortify\Enums\InsecureAdminUri;
 use Wobqqq\Fortify\Enums\SessionSameSite;
 use Wobqqq\Fortify\Enums\WidgetItemColor;
@@ -22,7 +23,7 @@ use Wobqqq\Fortify\Transformers\FortifyTransformer;
 final readonly class WidgetService
 {
     /**
-     * @return array<int, mixed>
+     * @return array<int, WidgetGroupDto>
      */
     public function getWidgetGroups(): array
     {
@@ -36,8 +37,7 @@ final readonly class WidgetService
     }
 
     /**
-     * @param array<int, mixed> $groups
-     * @return void
+     * @param array<int, WidgetGroupDto> $groups
      */
     private function initInfoData(array &$groups): void
     {
@@ -46,7 +46,6 @@ final readonly class WidgetService
             Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests'),
             'icon-wrench',
         );
-
 
         $list = [];
 
@@ -78,16 +77,14 @@ final readonly class WidgetService
             /** @var string $name */
             $name = Lang::get(
                 'wobqqq.fortify::lang.fields.vulnerable_backend_uri_success',
-                ['uri' => sprintf('/%s', $backendUri),
-                ]
+                ['uri' => e(sprintf('/%s', $backendUri))]
             );
         } else {
             $color = WidgetItemColor::DANGER;
             /** @var string $name */
             $name = Lang::get(
                 'wobqqq.fortify::lang.fields.vulnerable_backend_uri_warning',
-                ['uri' => sprintf('/%s', $backendUri),
-                ]
+                ['uri' => e(sprintf('/%s', $backendUri))]
             );
         }
         $list[] = FortifyTransformer::widgetGroupItemDto(
@@ -128,7 +125,7 @@ final readonly class WidgetService
         );
 
         $numberOfOutdatedAdmins = $backendUserCache->countOutdatedAdmins();
-        $color = $numberOfOutdatedAdmins <= 0 ? WidgetItemColor::SUCCESS : WidgetItemColor::DANGER  ;
+        $color = $numberOfOutdatedAdmins <= 0 ? WidgetItemColor::SUCCESS : WidgetItemColor::DANGER;
         /** @var string $name */
         $name = Lang::get(
             'wobqqq.fortify::lang.fields.vulnerable_number_of_outdated_administrators',
@@ -146,14 +143,12 @@ final readonly class WidgetService
             'icon-info-circle',
         );
 
-        /** @var BackendUserCache $backendUserCache */
-        $backendUserCache = app(BackendUserCache::class);
         $logins = $backendUserCache->getLoginsByLogins(SensitiveAdministratorLoginCheckerService::LOGINS);
-        $color = empty($logins) ? WidgetItemColor::SUCCESS : WidgetItemColor::DANGER;
+        $color = $logins === [] ? WidgetItemColor::SUCCESS : WidgetItemColor::DANGER;
         /** @var string $name */
         $name = Lang::get(
             'wobqqq.fortify::lang.fields.sensitive_administrator_login_checker',
-            ['logins' => (empty($logins) ? '0' : implode(', ', $logins))],
+            ['logins' => e($logins === [] ? '0' : implode(', ', $logins))],
         );
         $list[] = FortifyTransformer::widgetGroupItemDto(
             $name,
@@ -237,171 +232,42 @@ final readonly class WidgetService
     }
 
     /**
-     * @param array<int, mixed> $groups
-     * @return void
+     * @param array<int, WidgetGroupDto> $groups
      */
     private function initModulesData(array &$groups): void
     {
         $list = [];
 
-        $buttons = [];
-        if (PluginManager::instance()->hasPlugin('wobqqq.fortifyadminipaccess')) {
-            if (PluginManager::instance()->isDisabled('Wobqqq.FortifyAdminIpAccess')) {
-                $buttons = [
-                    FortifyTransformer::widgetItemLinkDto(
-                        'wobqqq.fortify::lang.buttons.enable_plugin',
-                        Backend::url('system/updates/manage'),
-                        'icon-plug',
-                    ),
-                ];
-            }
-        } else {
-            $buttons = [
-                FortifyTransformer::widgetItemLinkDto(
-                    'wobqqq.fortify::lang.buttons.install_plugin',
-                    'https://octobercms.com/plugin/wobqqq-fortifyadminipaccess',
-                    'icon-plus',
-                    '_blank',
-                ),
-            ];
-        }
-        /** @var string $name */
-        $name = Lang::get('wobqqq.fortify::lang.fields.admin_ip_access');
-        $widgetGroupItemDto = FortifyTransformer::widgetGroupItemDto(
-            $name,
-            $buttons,
-            WidgetItemColor::DANGER,
-            'icon-ban',
-        );
-        /** @phpstan-ignore-next-line */
-        Event::fire(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_ADMIN_IP_ACCESS->value, [&$widgetGroupItemDto]);
-        $list[] = $widgetGroupItemDto;
+        foreach (FortifyModule::cases() as $module) {
+            $buttons = [];
 
-        $buttons = [];
-        if (PluginManager::instance()->hasPlugin('wobqqq.fortifyipblocker')) {
-            if (PluginManager::instance()->isDisabled('Wobqqq.FortifyIpBlocker')) {
-                $buttons = [
-                    FortifyTransformer::widgetItemLinkDto(
-                        'wobqqq.fortify::lang.buttons.enable_plugin',
-                        Backend::url('system/updates/manage'),
-                        'icon-plug',
-                    ),
-                ];
-            }
-        } else {
-            $buttons = [
-                FortifyTransformer::widgetItemLinkDto(
+            if (!PluginManager::instance()->hasPlugin($module->pluginCode())) {
+                $buttons[] = FortifyTransformer::widgetItemLinkDto(
                     'wobqqq.fortify::lang.buttons.install_plugin',
-                    'https://octobercms.com/plugin/wobqqq-fortifyipblocker',
+                    $module->marketplaceUrl(),
                     'icon-plus',
                     '_blank',
-                ),
-            ];
-        }
-        /** @var string $name */
-        $name = Lang::get('wobqqq.fortify::lang.fields.ip_blocker');
-        $widgetGroupItemDto = FortifyTransformer::widgetGroupItemDto(
-            $name,
-            $buttons,
-            WidgetItemColor::DANGER,
-            'icon-ban',
-        );
-        /** @phpstan-ignore-next-line */
-        Event::fire(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_IP_BLOCKER->value, [&$widgetGroupItemDto]);
-        $list[] = $widgetGroupItemDto;
+                );
+            } elseif (PluginManager::instance()->isDisabled($module->pluginCode())) {
+                $buttons[] = FortifyTransformer::widgetItemLinkDto(
+                    'wobqqq.fortify::lang.buttons.enable_plugin',
+                    Backend::url('system/updates/manage'),
+                    'icon-plug',
+                );
+            }
 
-        $buttons = [];
-        if (PluginManager::instance()->hasPlugin('wobqqq.fortifysmartipblocker')) {
-            if (PluginManager::instance()->isDisabled('Wobqqq.FortifySmartIpBlocker')) {
-                $buttons = [
-                    FortifyTransformer::widgetItemLinkDto(
-                        'wobqqq.fortify::lang.buttons.enable_plugin',
-                        Backend::url('system/updates/manage'),
-                        'icon-plug',
-                    ),
-                ];
-            }
-        } else {
-            $buttons = [
-                FortifyTransformer::widgetItemLinkDto(
-                    'wobqqq.fortify::lang.buttons.install_plugin',
-                    'https://octobercms.com/plugin/wobqqq-fortifysmartipblocker',
-                    'icon-plus',
-                    '_blank',
-                ),
-            ];
-        }
-        $widgetGroupItemDto = FortifyTransformer::widgetGroupItemDto(
-            'wobqqq.fortify::lang.fields.smart_ip_blocker',
-            $buttons,
-            WidgetItemColor::DANGER,
-            'icon-ban',
-        );
-        /** @phpstan-ignore-next-line */
-        Event::fire(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_SMART_IP_BLOCKER->value, [&$widgetGroupItemDto]);
-        $list[] = $widgetGroupItemDto;
+            $widgetGroupItemDto = FortifyTransformer::widgetGroupItemDto(
+                $module->label(),
+                $buttons,
+                WidgetItemColor::DANGER,
+                $module->icon(),
+            );
 
-        $buttons = [];
-        if (PluginManager::instance()->hasPlugin('wobqqq.fortifycsp')) {
-            if (PluginManager::instance()->isDisabled('Wobqqq.FortifyCsp')) {
-                $buttons = [
-                    FortifyTransformer::widgetItemLinkDto(
-                        'wobqqq.fortify::lang.buttons.enable_plugin',
-                        Backend::url('system/updates/manage'),
-                        'icon-plug',
-                    ),
-                ];
-            }
-        } else {
-            $buttons = [
-                FortifyTransformer::widgetItemLinkDto(
-                    'wobqqq.fortify::lang.buttons.install_plugin',
-                    'https://octobercms.com/plugin/wobqqq-fortifycsp',
-                    'icon-plus',
-                    '_blank',
-                ),
-            ];
-        }
-        $widgetGroupItemDto = FortifyTransformer::widgetGroupItemDto(
-            'wobqqq.fortify::lang.fields.csp',
-            $buttons,
-            WidgetItemColor::DANGER,
-            'icon-lock',
-        );
-        /** @phpstan-ignore-next-line */
-        Event::fire(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_CSP->value, [&$widgetGroupItemDto]);
-        $list[] = $widgetGroupItemDto;
+            /** @phpstan-ignore-next-line */
+            Event::fire($module->widgetEvent()->value, [&$widgetGroupItemDto]);
 
-        $buttons = [];
-        if (PluginManager::instance()->hasPlugin('wobqqq.fortifyinputsanitizer')) {
-            if (PluginManager::instance()->isDisabled('Wobqqq.FortifyInputSanitizer')) {
-                $buttons = [
-                    FortifyTransformer::widgetItemLinkDto(
-                        'wobqqq.fortify::lang.buttons.enable_plugin',
-                        Backend::url('system/updates/manage'),
-                        'icon-plug',
-                    ),
-                ];
-            }
-        } else {
-            $buttons = [
-                FortifyTransformer::widgetItemLinkDto(
-                    'wobqqq.fortify::lang.buttons.install_plugin',
-                    'https://octobercms.com/plugin/wobqqq-fortifyinputsanitizer',
-                    'icon-plus',
-                    '_blank',
-                ),
-            ];
+            $list[] = $widgetGroupItemDto;
         }
-        $widgetGroupItemDto = FortifyTransformer::widgetGroupItemDto(
-            'wobqqq.fortify::lang.fields.input_sanitizer',
-            $buttons,
-            WidgetItemColor::DANGER,
-            'icon-crosshairs',
-        );
-        /** @phpstan-ignore-next-line */
-        Event::fire(FortifyEvent::SERVICES_WIDGET_GROUP_ITEM_INPUT_SANITIZER->value, [&$widgetGroupItemDto]);
-        $list[] = $widgetGroupItemDto;
 
         $groups[] = FortifyTransformer::widgetGroupDto(
             'wobqqq.fortify::lang.fields.modules',
@@ -411,8 +277,7 @@ final readonly class WidgetService
     }
 
     /**
-     * @param array<int, mixed> $groups
-     * @return void
+     * @param array<int, WidgetGroupDto> $groups
      */
     private function initConfigData(array &$groups): void
     {
@@ -560,7 +425,7 @@ final readonly class WidgetService
         $passwordPolicyExpireDays = $fortifyConfigDto->enabled
             ? $fortifyConfigDto->passwordPolicyExpireDays
             : Config::get('backend.password_policy.expire_days');
-        $color = (bool)$passwordPolicyExpireDays
+        $color = is_int($passwordPolicyExpireDays) && $passwordPolicyExpireDays > 0
             ? WidgetItemColor::SUCCESS
             : WidgetItemColor::WARNING;
         $list[] = FortifyTransformer::widgetGroupItemDto(
@@ -570,7 +435,7 @@ final readonly class WidgetService
             'icon-cog',
         );
 
-        /** @var string|int $passwordPolicyMinLength */
+        /** @var int|string $passwordPolicyMinLength */
         $passwordPolicyMinLength = $fortifyConfigDto->enabled
             ? $fortifyConfigDto->passwordPolicyMinLength
             : Config::get('backend.password_policy.min_length');

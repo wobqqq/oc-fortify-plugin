@@ -6,13 +6,11 @@ namespace Wobqqq\Fortify\Queries;
 
 use Backend\Models\User;
 use Illuminate\Support\Carbon;
-use October\Rain\Database\Builder;
 
 final class BackendUserQuery
 {
     public function countSuperusers(): int
     {
-        /** @var Builder $query */
         $query = User::query();
         $query->where('is_superuser', true);
 
@@ -21,7 +19,6 @@ final class BackendUserQuery
 
     public function countOutdatedAdmins(): int
     {
-        /** @var Builder $query */
         $query = User::query();
         $query->whereDate('last_login', '<=', (Carbon::now()->subMonths(3)));
 
@@ -30,11 +27,11 @@ final class BackendUserQuery
 
     /**
      * @param array<int, string> $logins
+     *
      * @return array<int, string>
      */
     public function getLoginsByLogins(array $logins): array
     {
-        /** @var Builder $query */
         $query = User::query();
         $query->select(['login']);
         $query->whereIn('login', $logins);

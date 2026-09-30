@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Wobqqq\Fortify\Client;
 
 use Arr;
+use OpenSSLCertificate;
 
-final class SslSecurityCheckerClient
+class SslSecurityCheckerClient
 {
     /**
      * @return array<string, mixed>
@@ -30,7 +31,7 @@ final class SslSecurityCheckerClient
             $context
         );
 
-        if (!$client) {
+        if ($client === false) {
             return [
                 'success' => false,
                 'error' => $errorMessage,
@@ -38,10 +39,10 @@ final class SslSecurityCheckerClient
         }
 
         $params = stream_context_get_params($client);
-        /** @var \OpenSSLCertificate|null $cert */
+        /** @var OpenSSLCertificate|null $cert */
         $cert = Arr::get($params, 'options.ssl.peer_certificate');
 
-        if (!$cert) {
+        if ($cert === null) {
             fclose($client);
 
             return [
@@ -61,10 +62,10 @@ final class SslSecurityCheckerClient
             ];
         }
 
-        /** @var string|int|null $issuedOn */
+        /** @var int|string|null $issuedOn */
         $issuedOn = Arr::get($certData, 'validFrom_time_t');
         $issuedOn = (int)$issuedOn;
-        /** @var string|int|null $expiresOn */
+        /** @var int|string|null $expiresOn */
         $expiresOn = Arr::get($certData, 'validTo_time_t');
         $expiresOn = (int)$expiresOn;
 

@@ -9,7 +9,7 @@
     <p>
         <a
             class="<?php if(empty($sensitiveTcpPortCheckerDtoList)) { ?>text-danger<?php } ?>"
-            href="<?= \Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests') ?>"
+            href="<?= e(\Backend::url('system/settings/update/wobqqq/fortify/fortify#primarytab-tests')) ?>"
         >
             <?php if(!empty($sensitiveTcpPortCheckerDtoList)) { ?>
                 <?= trans('wobqqq.fortify::lang.comments.sensitive_tcp_ports_checker_ips') ?>
@@ -25,12 +25,12 @@
             <button
                 type="button"
                 class="fortify-button fortify-action btn btn-info"
-                data-request-data="{ _dash_definition: 'system', ip: '<?= $sensitiveTcpPortCheckerDto->ip ?>', action: '<?= \Wobqqq\Fortify\Enums\ButtonAction::SENSITIVE_TCP_PORTS_CHECKER_RUN_TEST->value ?>' }"
+                data-request-data="<?= e(json_encode(['_dash_definition' => 'system', 'ip' => $sensitiveTcpPortCheckerDto->ip, 'action' => \Wobqqq\Fortify\Enums\ButtonAction::SENSITIVE_TCP_PORTS_CHECKER_RUN_TEST->value], JSON_THROW_ON_ERROR)) ?>"
                 data-dismiss="popup"
                 data-control="popup"
                 data-handler="onFortifyAction"
             >
-                <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= $sensitiveTcpPortCheckerDto->ip ?>)
+                <i class="icon-rocket"></i> <?= e(trans('wobqqq.fortify::lang.buttons.run_test')) ?> (<?= e($sensitiveTcpPortCheckerDto->ip) ?>)
             </button>
         <?php } ?>
     <?php } ?>

@@ -6,6 +6,7 @@ namespace Wobqqq\Fortify\Listeners;
 
 use Backend\Models\User;
 use Wobqqq\Fortify\Cache\BackendUserCache;
+use Wobqqq\Fortify\Services\SensitiveAdministratorLoginCheckerService;
 
 final readonly class BackendUserListener
 {
@@ -15,20 +16,11 @@ final readonly class BackendUserListener
 
     public function subscribe(): void
     {
-        User::extend(function (User $user) {
-            $user->bindEvent('model.afterSave', function () {
-                $this->backendUserCache->clearCountSuperusers();
-                $this->backendUserCache->countOutdatedAdmins();
-                $this->backendUserCache->clearCountOutdatedAdmins();
-                $this->backendUserCache->clearGetLoginsByLogins();
-            });
+        User::extend(function (User $user): void {
+            $clear = fn () => $this->backendUserCache->clear(SensitiveAdministratorLoginCheckerService::LOGINS);
 
-            $user->bindEvent('model.afterDelete', function () {
-                $this->backendUserCache->clearCountSuperusers();
-                $this->backendUserCache->countOutdatedAdmins();
-                $this->backendUserCache->clearCountOutdatedAdmins();
-                $this->backendUserCache->clearGetLoginsByLogins();
-            });
+            $user->bindEvent('model.afterSave', $clear);
+            $user->bindEvent('model.afterDelete', $clear);
         });
     }
 }

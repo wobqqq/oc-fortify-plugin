@@ -20,7 +20,7 @@ final readonly class ConfigDto
         public bool $passwordPolicyRequireLowercase,
         public bool $passwordPolicyRequireNumber,
         public bool $passwordPolicyRequireNonAlpha,
-        public bool $passwordPolicyExpireDays,
+        public int $passwordPolicyExpireDays,
         public int $passwordPolicyMinLength,
         public bool $backendForceSecure,
         public bool $backendForceSingleSession,

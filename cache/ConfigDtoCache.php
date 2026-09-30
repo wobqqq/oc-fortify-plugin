@@ -12,14 +12,7 @@ final class ConfigDtoCache extends BasicCache
 {
     public function get(): ConfigDto
     {
-        $cacheKey = $this->cacheKey();
-
-        /** @var ConfigDto $configDto */
-        $configDto = Cache::remember($cacheKey, self::TTL, function () {
-            return FortifyTransformer::configDto();
-        });
-
-        return $configDto;
+        return $this->remember($this->cacheKey(), static fn (): ConfigDto => FortifyTransformer::configDto());
     }
 
     public function clear(): void

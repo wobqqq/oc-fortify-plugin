@@ -25,19 +25,19 @@
                 <td>
                     <?php if($url->isPositive) { ?>
                     <span class="text-success">
-                        <?= $url->url ?>
+                        <?= e($url->url) ?>
                     </span>
                     <?php } else { ?>
-                    <a class="text-danger" href="<?= $url->url ?>" target="_blank">
-                        <?= (strlen($url->url) > 40 ? substr($url->url, 0, 40) . '...' : $url->url) ?>
+                    <a class="text-danger" href="<?= e($url->url) ?>" target="_blank" rel="noopener noreferrer">
+                        <?= e(\Str::limit($url->url, 40)) ?>
                     </a>
                     <?php } ?>
                 </td>
                 <td>
                     <?php if($url->isPositive) { ?>
-                        <span class="text-success"><?= $url->status ?></span>
+                        <span class="text-success"><?= e($url->status) ?></span>
                     <?php } else { ?>
-                        <span class="text-danger" ><?= $url->status ?></span>
+                        <span class="text-danger" ><?= e($url->status) ?></span>
                     <?php } ?>
                 </td>
             </tr>

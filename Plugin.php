@@ -8,6 +8,7 @@ use Event;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
 use Wobqqq\Fortify\Console\ConfigDisableCommand;
+use Wobqqq\Fortify\Enums\Permission;
 use Wobqqq\Fortify\Listeners\BackendUserListener;
 use Wobqqq\Fortify\Listeners\FortifyListener;
 use Wobqqq\Fortify\Models\Fortify;
@@ -38,7 +39,7 @@ final class Plugin extends PluginBase
                 'description' => 'wobqqq.fortify::lang.messages.fortify_description',
                 'icon' => 'icon-shield',
                 'class' => Fortify::class,
-                'permissions' => ['app-fortify'],
+                'permissions' => [Permission::FORTIFY->value],
                 'order' => 1,
                 'category' => SettingsManager::CATEGORY_SYSTEM,
             ],
@@ -54,7 +55,7 @@ final class Plugin extends PluginBase
             Widgets\Fortify::class => [
                 'label' => 'wobqqq.fortify::lang.widgets.fortify',
                 'context' => 'dashboard',
-                'permissions' => ['app-fortify'],
+                'permissions' => [Permission::FORTIFY->value],
             ],
         ];
     }

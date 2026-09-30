@@ -200,9 +200,12 @@ tabs:
         config[password_policy_expire_days]:
             label: 'wobqqq.fortify::lang.fields.password_policy_expire_days'
             span: auto
-            type: switch
+            type: number
+            min: 0
+            max: 3650
             tab: 'wobqqq.fortify::lang.tabs.config'
-            default: false
+            default: 0
+            comment: 'wobqqq.fortify::lang.comments.password_policy_expire_days'
             trigger:
                 action: show
                 field: config[enabled]

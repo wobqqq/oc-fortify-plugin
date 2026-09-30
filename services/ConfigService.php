@@ -36,8 +36,11 @@ final class ConfigService
         Config::set('backend.password_policy.require_uppercase', $fortifyConfigDto->passwordPolicyRequireUppercase);
         Config::set('backend.password_policy.require_lowercase', $fortifyConfigDto->passwordPolicyRequireLowercase);
         Config::set('backend.password_policy.require_number', $fortifyConfigDto->passwordPolicyRequireNumber);
-        Config::set('backend.password_policy.require_non_alpha', $fortifyConfigDto->passwordPolicyRequireNonAlpha);
-        Config::set('backend.password_policy.expire_days', $fortifyConfigDto->passwordPolicyExpireDays);
+        Config::set('backend.password_policy.require_nonalpha', $fortifyConfigDto->passwordPolicyRequireNonAlpha);
+        Config::set(
+            'backend.password_policy.expire_days',
+            $fortifyConfigDto->passwordPolicyExpireDays > 0 ? $fortifyConfigDto->passwordPolicyExpireDays : false,
+        );
         Config::set('backend.password_policy.min_length', $fortifyConfigDto->passwordPolicyMinLength);
 
         Config::set('backend.force_secure', $fortifyConfigDto->backendForceSecure);

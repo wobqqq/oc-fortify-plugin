@@ -16,12 +16,12 @@ final readonly class FortifyListener
 
     public function subscribe(): void
     {
-        Fortify::extend(function (Fortify $fortify) {
-            $fortify->bindEvent('model.afterSave', function () {
+        Fortify::extend(function (Fortify $fortify): void {
+            $fortify->bindEvent('model.afterSave', function (): void {
                 $this->configDtoCache->clear();
             });
 
-            $fortify->bindEvent('model.afterDelete', function () {
+            $fortify->bindEvent('model.afterDelete', function (): void {
                 $this->configDtoCache->clear();
             });
         });

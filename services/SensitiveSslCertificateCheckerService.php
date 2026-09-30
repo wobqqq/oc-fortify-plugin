@@ -26,17 +26,9 @@ final readonly class SensitiveSslCertificateCheckerService
         $appUrl = rtrim($appUrl, '/');
 
         $host = parse_url($appUrl, PHP_URL_HOST);
+        $host = is_string($host) && $host !== '' ? $host : $appUrl;
 
-        if (!$host) {
-            $host = $appUrl;
-        }
-
-        $host = preg_replace('/^www\./i', '', $host);
-
-        /** @var array<int, array<string, string>> $sslCertificateCheckerHosts */
-        $sslCertificateCheckerHosts = [['host' => $host, 'ports' => '443']];
-
-        return $sslCertificateCheckerHosts;
+        return [['host' => (string)preg_replace('/^www\./i', '', $host), 'ports' => '443']];
     }
 
     /**

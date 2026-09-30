@@ -15,56 +15,40 @@ final class BackendUserCache extends BasicCache
 
     public function countSuperusers(): int
     {
-        $cacheKey = $this->cacheKey(['countSuperusers']);
-
-        /** @var int $numberOfSuperusers */
-        $numberOfSuperusers = Cache::remember($cacheKey, self::TTL, function () {
-            return $this->backendUserQuery->countSuperusers();
-        });
-
-        return $numberOfSuperusers;
-    }
-
-    public function clearCountSuperusers(): void
-    {
-        Cache::forget($this->cacheKey(['countSuperusers']));
+        return $this->remember(
+            $this->cacheKey(['countSuperusers']),
+            fn (): int => $this->backendUserQuery->countSuperusers(),
+        );
     }
 
     public function countOutdatedAdmins(): int
     {
-        $cacheKey = $this->cacheKey(['countOutdatedAdmins']);
-
-        /** @var int $numberOfOutdatedAdmins */
-        $numberOfOutdatedAdmins = Cache::remember($cacheKey, self::TTL, function () {
-            return $this->backendUserQuery->countOutdatedAdmins();
-        });
-
-        return $numberOfOutdatedAdmins;
-    }
-
-    public function clearCountOutdatedAdmins(): void
-    {
-        Cache::forget($this->cacheKey(['countOutdatedAdmins']));
+        return $this->remember(
+            $this->cacheKey(['countOutdatedAdmins']),
+            fn (): int => $this->backendUserQuery->countOutdatedAdmins(),
+        );
     }
 
     /**
      * @param array<int, string> $logins
+     *
      * @return array<int, string>
      */
     public function getLoginsByLogins(array $logins): array
     {
-        $cacheKey = $this->cacheKey(['getLoginsByLogins']);
-
-        /** @var array<int, string> $logins */
-        $logins = Cache::remember($cacheKey, self::TTL, function () use ($logins) {
-            return $this->backendUserQuery->getLoginsByLogins($logins);
-        });
-
-        return $logins;
+        return $this->remember(
+            $this->cacheKey(['getLoginsByLogins'], $logins),
+            fn (): array => $this->backendUserQuery->getLoginsByLogins($logins),
+        );
     }
 
-    public function clearGetLoginsByLogins(): void
+    /**
+     * @param array<int, string> $logins
+     */
+    public function clear(array $logins): void
     {
-        Cache::forget($this->cacheKey(['getLoginsByLogins']));
+        Cache::forget($this->cacheKey(['countSuperusers']));
+        Cache::forget($this->cacheKey(['countOutdatedAdmins']));
+        Cache::forget($this->cacheKey(['getLoginsByLogins'], $logins));
     }
 }

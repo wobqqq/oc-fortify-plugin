@@ -27,19 +27,19 @@
                 <td>
                     <?php if($port->isPositive) { ?>
                     <span class="text-success">
-                        <?= $port->host ?>
+                        <?= e($port->host) ?>
                     </span>
                     <?php } else { ?>
                     <span class="text-danger">
-                        <?= (strlen($port->host) > 40 ? substr($port->host, 0, 40) . '...' : $port->host) ?>
+                        <?= e(\Str::limit($port->host, 40)) ?>
                     </span>
                     <?php } ?>
                 </td>
                 <td>
                     <?php if($port->isPositive) { ?>
-                        <span class="text-success"><?= $port->port ?></span>
+                        <span class="text-success"><?= e($port->port) ?></span>
                     <?php } else { ?>
-                        <span class="text-danger" ><?= $port->port ?></span>
+                        <span class="text-danger" ><?= e($port->port) ?></span>
                     <?php } ?>
                 </td>
                 <td>

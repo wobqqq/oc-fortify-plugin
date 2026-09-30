@@ -51,6 +51,7 @@ return [
         'session_lifetime' => 'Here you may specify the number of minutes that you wish the session to be allowed to
         remain idle for it is expired. If you want them to immediately expire when the browser closes, set it to zero.',
         'password_policy_section' => 'Specify the password policy for backend administrators.',
+        'password_policy_expire_days' => 'Administrators must change their password after this many days. 0 disables the expiration.',
         'config_enabled' => '<b>When enabled, all current settings will be applied. Previous settings will be
         overwritten by the current ones.</b>',
         'admin_ip_access_enabled' => '<b>When enabled, access to the admin panel is limited by the IP whitelist.</b>',
@@ -62,7 +63,7 @@ return [
         users cannot sign in to multiple devices at the same time. When a new sign in occurs, all other sessions for
         that user are invalidated.',
         'admin_ip_access_view' => 'The code of the page that will be displayed when the admin panel is unavailable.',
-        'smart_ip_blocker_view' => 'The code of the page that will be displayed when the admin panel is unavailable.',
+        'smart_ip_blocker_view' => 'The page that will be displayed to a blocked IP.',
         'ip_blocker_view' => 'The code of the page that will be displayed when CMS is unavailable.',
         'input_sanitizer_view' => 'The page shown when the request contains invalid input.',
         'admin_ip_access_ips' => 'The admin panel will only be accessible from the <b>static IPs</b>
@@ -283,7 +284,7 @@ return [
         'password_policy_require_lowercase' => 'Require at least one lowercase letter (a–z)',
         'password_policy_require_number' => 'Require at least one number',
         'password_policy_require_nonalpha' => 'Require non-alphabetic characters',
-        'password_policy_expire_days' => 'Enable password expiration after number of days, false to disable',
+        'password_policy_expire_days' => 'Password expiration (days)',
         'password_policy_min_length' => 'Password minimum length between 4 - 128 chars',
         'backend_force_secure' => 'Force HTTPS security',
         'backend_force_single_session' => 'Force Single Session',
