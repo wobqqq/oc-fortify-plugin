@@ -8,7 +8,7 @@ Guidance for AI coding agents (Claude Code, Codex, Junie, Cursor) working in thi
 
 - hardens the application config at boot (`ConfigService::overrideConfig()`: session cookies, the backend password policy, forced HTTPS, single session) from the settings page **Settings → Fortify**;
 - draws a dashboard report widget (`widgets/Fortify.php`) with system checks and three scanners: sensitive files over HTTP, open TCP ports, TLS certificates;
-- is the extension point of five paid modules, each its own repository and marketplace plugin: Admin IP Access, IP Blocker, Smart IP Blocker, CSP, Input Sanitizer.
+- is the extension point of five free modules, each its own repository and marketplace plugin: Admin IP Access, IP Blocker, Smart IP Blocker, CSP, Input Sanitizer.
 
 This is a **security product installed on production sites**. A bug here locks administrators out, leaks data or silently leaves a site unprotected. Security and safe upgrades come before everything else.
 
