@@ -26,7 +26,7 @@ it('reads the values the settings form stores', function (): void {
         'enabled' => '1',
         'session_same_site' => 'lax',
         'session_lifetime' => '45',
-        'password_policy_expire_days' => '60',
+        'password_policy_expire_after_days' => '60',
         'password_policy_min_length' => '12',
     ]);
 
@@ -39,11 +39,17 @@ it('reads the values the settings form stores', function (): void {
         ->and($dto->passwordPolicyMinLength)->toBe(12);
 });
 
-it('reads the switch the previous versions stored for password expiration as off', function (mixed $stored): void {
+it('ignores the switch the previous versions stored for password expiration', function (mixed $stored): void {
     Fortify::set('config', ['password_policy_expire_days' => $stored]);
 
     expect(FortifyTransformer::configDto()->passwordPolicyExpireDays)->toBe(0);
-})->with([true, false, null, '', -5]);
+})->with([true, 1, '1', false, 0]);
+
+it('reads a broken number of days as no expiration', function (mixed $stored): void {
+    Fortify::set('config', ['password_policy_expire_after_days' => $stored]);
+
+    expect(FortifyTransformer::configDto()->passwordPolicyExpireDays)->toBe(0);
+})->with([true, null, '', -5, 'soon']);
 
 it('normalizes the sensitive files checker lists', function (): void {
     Fortify::set('tests', [

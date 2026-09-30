@@ -24,7 +24,9 @@ The settings live in one `system_settings` row (`item = wobqqq_fortify_fortify`,
   - it converts every row with that `item` (one per site in a multisite install) and skips rows without the setting or with invalid JSON;
   - it keeps the site's current behaviour, unless the change is the fix itself, and says so in the version note;
   - `down()` converts back;
-  - it is covered by a test (`tests/Feature/PasswordExpirationMigrationTest.php` is the reference).
+  - it is covered by a test against a `system_settings` table.
+- **Prefer a new key to converting an ambiguous value.** When the old value cannot be told apart from a valid new one (a switch stored as `1` is also "1 day"), store the new setting under a new key and ignore the old one, as `password_policy_expire_after_days` replaced the `password_policy_expire_days` switch. A conversion script is for values it can convert without guessing.
+- An update script that writes `system_settings` directly bypasses October's query cache (`SettingModel::getSettingsRecord()` remembers the record for a day) and the plugins' caches: clear them, or avoid the script.
 - The transformer still accepts the old shape: a site can run the new code before its update script ran.
 - Never rename a key another module reads (`config`, `tests`, `ip_firewall`, `csp`, `input_sanitizer`).
 

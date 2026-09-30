@@ -70,7 +70,7 @@ final readonly class FortifyTransformer
         $passwordPolicyRequireNonAlpha = (bool)$passwordPolicyRequireNonAlpha;
 
         /** @var bool|int|string|null $passwordPolicyExpireDays */
-        $passwordPolicyExpireDays = Fortify::get('config.password_policy_expire_days');
+        $passwordPolicyExpireDays = Fortify::get('config.password_policy_expire_after_days');
         $passwordPolicyExpireDays = is_numeric($passwordPolicyExpireDays) ? max(0, (int)$passwordPolicyExpireDays) : 0;
 
         /** @var int|string|null $passwordPolicyMinLength */

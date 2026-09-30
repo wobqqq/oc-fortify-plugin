@@ -197,7 +197,7 @@ tabs:
                 action: show
                 field: config[enabled]
                 condition: checked
-        config[password_policy_expire_days]:
+        config[password_policy_expire_after_days]:
             label: 'wobqqq.fortify::lang.fields.password_policy_expire_days'
             span: auto
             type: number

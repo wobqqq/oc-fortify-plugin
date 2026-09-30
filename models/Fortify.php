@@ -49,7 +49,7 @@ class Fortify extends SettingModel
     public array $rules = [
         'config.password_policy_min_length' => 'required|integer|min:4|max:128',
         'config.session_lifetime' => 'required|integer|min:1|max:1000',
-        'config.password_policy_expire_days' => 'nullable|integer|min:0|max:3650',
+        'config.password_policy_expire_after_days' => 'nullable|integer|min:0|max:3650',
         'tests.sensitive_files_checker_urls.*.url' => 'nullable|max:255|url:http,https',
         'tests.sensitive_files_checker_urls' => 'nullable|array|max:100',
         'tests.sensitive_files_checker_paths.*.path' => 'nullable|max:150|string',
@@ -107,7 +107,7 @@ class Fortify extends SettingModel
             'password_policy_require_lowercase' => Config::get('backend.password_policy.require_lowercase'),
             'password_policy_require_number' => Config::get('backend.password_policy.require_number'),
             'password_policy_require_nonalpha' => Config::get('backend.password_policy.require_nonalpha'),
-            'password_policy_expire_days' => is_numeric($expireDays = Config::get('backend.password_policy.expire_days')) ? (int)$expireDays : 0,
+            'password_policy_expire_after_days' => is_numeric($expireDays = Config::get('backend.password_policy.expire_days')) ? (int)$expireDays : 0,
             'password_policy_require_uppercase' => Config::get('backend.password_policy.require_uppercase'),
             'backend_force_secure' => Config::get('backend.force_secure'),
             'backend_force_single_session' => Config::get('backend.force_single_session'),

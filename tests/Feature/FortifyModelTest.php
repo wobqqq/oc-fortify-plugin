@@ -25,7 +25,7 @@ it('starts from the application config and the default checks', function (): voi
 
     expect($settings->config)->toMatchArray([
         'enabled' => false,
-        'password_policy_expire_days' => 45,
+        'password_policy_expire_after_days' => 45,
         'session_lifetime' => 60,
     ])->and($settings->tests)->toMatchArray(['sensitive_files_checker_urls' => [['url' => 'https://fortify.test']]]);
 });
@@ -51,7 +51,7 @@ it('lets the modules offer their own pages', function (): void {
 
 it('validates the password expiration as a number of days', function (mixed $days, bool $passes): void {
     $validator = fortifyValidation([
-        'config' => ['password_policy_min_length' => 12, 'session_lifetime' => 30, 'password_policy_expire_days' => $days],
+        'config' => ['password_policy_min_length' => 12, 'session_lifetime' => 30, 'password_policy_expire_after_days' => $days],
     ]);
 
     expect($validator->passes())->toBe($passes);

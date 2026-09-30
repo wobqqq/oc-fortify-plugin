@@ -112,7 +112,7 @@ it('reads the config the application runs with while Fortify is disabled', funct
     expect(widgetGroupItem('wobqqq.fortify::lang.fields.config', 'wobqqq.fortify::lang.fields.password_policy_min_length')->color)->toBe(WidgetItemColor::SUCCESS)
         ->and(widgetGroupItem('wobqqq.fortify::lang.fields.config', 'wobqqq.fortify::lang.fields.password_policy_expire_days')->color)->toBe(WidgetItemColor::SUCCESS);
 
-    FortifySettings::set('config', ['enabled' => true, 'password_policy_min_length' => 8, 'password_policy_expire_days' => 0]);
+    FortifySettings::set('config', ['enabled' => true, 'password_policy_min_length' => 8, 'password_policy_expire_after_days' => 0]);
     Wobqqq\Fortify\Instances\ConfigDtoInstance::forgetInstance();
 
     expect(widgetGroupItem('wobqqq.fortify::lang.fields.config', 'wobqqq.fortify::lang.fields.password_policy_min_length')->color)->toBe(WidgetItemColor::DANGER)

@@ -33,7 +33,7 @@ function saveConfig(array $config): void
         'password_policy_require_lowercase' => true,
         'password_policy_require_number' => true,
         'password_policy_require_nonalpha' => true,
-        'password_policy_expire_days' => 90,
+        'password_policy_expire_after_days' => 90,
         'password_policy_min_length' => 14,
         'backend_force_secure' => true,
         'backend_force_single_session' => true,
@@ -82,7 +82,7 @@ it('writes the non-alphanumeric rule under the key October reads', function (): 
 });
 
 it('turns password expiration off with zero days', function (): void {
-    saveConfig(['password_policy_expire_days' => 0]);
+    saveConfig(['password_policy_expire_after_days' => 0]);
 
     bootConfigService();
 

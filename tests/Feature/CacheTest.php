@@ -21,7 +21,7 @@ it('caches the config until the settings are saved', function (): void {
 });
 
 it('rebuilds a cached config the previous plugin version wrote in another shape', function (): void {
-    Fortify::set('config', ['enabled' => true, 'password_policy_expire_days' => 30]);
+    Fortify::set('config', ['enabled' => true, 'password_policy_expire_after_days' => 30]);
     $cache = app(ConfigDtoCache::class);
 
     Cache::shouldReceive('remember')->once()->andThrow(new TypeError('Cannot assign string to property'));
