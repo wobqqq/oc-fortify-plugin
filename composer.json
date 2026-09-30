@@ -91,7 +91,7 @@
         "code.cs.check": "php-cs-fixer fix --diff --dry-run",
         "code.cs.fix": "php-cs-fixer fix --diff",
         "code.fix": [
-            "@composer normalize",
+            "@composer normalize --no-update-lock",
             "@code.cs.fix",
             "@code.rector.fix"
         ],

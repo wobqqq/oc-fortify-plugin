@@ -190,13 +190,13 @@ namespace System\Models {
          */
         public function save(?array $options = [], $sessionKey = null)
         {
-            if ($this->fireEvent('model.beforeSave', halt: true) === false) {
+            if ($this->fireModelEvent('saving') === false) {
                 return false;
             }
 
             static::$records[static::class] = $this->getAttributes();
 
-            $this->fireEvent('model.afterSave');
+            $this->fireModelEvent('saved', false);
 
             return true;
         }
@@ -206,9 +206,11 @@ namespace System\Models {
          */
         public function delete()
         {
+            $this->fireModelEvent('deleting');
+
             unset(static::$records[static::class], static::$instances[static::class]);
 
-            $this->fireEvent('model.afterDelete');
+            $this->fireModelEvent('deleted', false);
 
             return true;
         }
