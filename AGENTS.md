@@ -81,6 +81,16 @@ Read the `fortify-security` skill for the full checklist. The non-negotiables:
 
 Pest 4 on Orchestra Testbench (Laravel 12) with the real `october/rain`. The licensed October modules are not installable in CI, so `tests/Stubs/October.php` reproduces the few classes the plugin touches with October 4.4's behaviour (`SettingModel`, `PluginBase`, `ReportWidgetBase`, `PluginManager`, `BackendAuth`, ...). When the plugin starts using another October class or behaviour, add it there, matching October's real signature. Read the `plugin-testing` skill.
 
+## Git workflow
+
+- `main` is protected: **never push to it and never force-push.** Every change goes through a pull request:
+  1. branch off the latest `main`, named after the change (`fix/…`, `feat/…`, `chore/…`, `docs/…`);
+  2. commit on the branch and `git push -u origin <branch>`;
+  3. open a pull request with the template filled in (what changes, what it means for sites that upgrade);
+  4. merge only once CI is green, then delete the branch.
+- A release is a tag pushed on a merged commit of `main` (the `plugin-upgrades` skill says how); the tag is the only thing pushed outside a pull request.
+- Code, comments, commit messages, pull requests, issues and documentation are written in **English**.
+
 ## Conventions
 
 - `declare(strict_types=1);` in every PHP file; PSR-12 via php-cs-fixer (`(int)$x` without a space, imported classes).
