@@ -9,7 +9,12 @@
         "october-plugin",
         "security",
         "hardening",
-        "fortify"
+        "fortify",
+        "laravel",
+        "php",
+        "firewall",
+        "vulnerability-scanner",
+        "security-audit"
     ],
     "authors": [
         {
@@ -17,10 +22,11 @@
             "homepage": "https://github.com/wobqqq"
         }
     ],
-    "homepage": "https://github.com/wobqqq/oc-fortify-plugin",
+    "homepage": "https://octobercms.com/plugin/wobqqq-fortify",
     "support": {
         "issues": "https://github.com/wobqqq/oc-fortify-plugin/issues",
         "source": "https://github.com/wobqqq/oc-fortify-plugin",
+        "docs": "https://github.com/wobqqq/oc-fortify-plugin#readme",
         "security": "https://github.com/wobqqq/oc-fortify-plugin/security/policy"
     },
     "require": {
