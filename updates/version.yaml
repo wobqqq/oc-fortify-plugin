@@ -4,3 +4,5 @@ v1.0.2:
     - 'Changes in events'
 v1.0.3:
     - 'Password expiration takes a number of days, the non-alphanumeric password rule is applied, the dashboard widget runs only its own checks and escapes what it prints, the sensitive files checker no longer follows redirects and the TCP ports are checked in parallel'
+v1.0.4:
+    - 'The Packagist page links to the marketplace, the docs and the three ways to install; releases are published on GitHub'
