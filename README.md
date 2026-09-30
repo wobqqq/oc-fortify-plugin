@@ -1,5 +1,11 @@
 # Fortify
 
+[![CI](https://github.com/wobqqq/oc-fortify-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/wobqqq/oc-fortify-plugin/actions/workflows/ci.yml)
+[![October CMS](https://img.shields.io/badge/October%20CMS-3.x%20%7C%204.x-e24848)](https://octobercms.com/plugin/wobqqq-fortify)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)](composer.json)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%20max-brightgreen)](phpstan.neon.dist)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
+
 **Fortify** is a comprehensive security suite for October CMS that helps you harden your application, monitor vulnerabilities, and enforce best security practices.
 
 It provides system diagnostics, configuration hardening tools, and integrates seamlessly with additional Fortify extensions.
@@ -74,7 +80,7 @@ Each module extends Fortify with additional protection layers.
 - Require lowercase letters (a–z)
 - Require numbers
 - Require non-alphabetic characters
-- Password expiration support
+- Password expiration after a number of days
 - Password length control (4–128 characters)
 
 #### Advanced Security
@@ -83,7 +89,7 @@ Each module extends Fortify with additional protection layers.
 
 ## 📦 Requirements
 - PHP 8.2 or higher
-- October CMS 3.0 or higher
+- October CMS 3.x or 4.x
 
 ## 💻 Usage
 
@@ -97,3 +103,26 @@ Navigate to `Settings -> Fortify` to view security settings and enable/disable f
 
 ```bash
 php artisan wobqqq.fortify:config:disable
+```
+
+## ⬆️ Upgrading
+
+- **1.0.3** — password expiration is now a number of days (`0` turns it off). The previous switch never expired a password, so the update keeps it off: set the number of days to start using it. The non-alphanumeric password rule is now applied to administrators' passwords.
+
+## 🔒 Security
+
+Please report a vulnerability privately, as described in [SECURITY.md](SECURITY.md).
+
+## 🛠️ Development
+
+The toolchain runs in Docker, the host needs nothing but `docker` and `make`:
+
+```bash
+make install        # composer install
+make code.fix       # composer normalize, Rector, PHP CS Fixer
+make code.check     # composer validate/audit, php -l, YAML lint, PHP CS Fixer, Rector, PHPStan (level max)
+make test.coverage  # Pest with coverage (90 % minimum)
+make ready          # everything above
+```
+
+Every pull request runs the same checks on GitHub Actions, plus a syntax check on PHP 8.2. Pushing a tag that matches the last version in `updates/version.yaml` releases it to the October CMS marketplace once CI has passed.
