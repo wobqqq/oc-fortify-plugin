@@ -1,12 +1,112 @@
 {
     "name": "wobqqq/fortify-plugin",
-    "type": "october-plugin",
-    "description": "Setting up the application protection system",
-    "homepage": "https://github.com/wobqqq/oc-fortify-plugin",
-    "keywords": ["october", "octobercms", "fortify"],
+    "description": "Security suite for October CMS: hardening checks, security scanners and a dashboard widget",
     "license": "MIT",
+    "type": "october-plugin",
+    "keywords": [
+        "october",
+        "octobercms",
+        "october-plugin",
+        "security",
+        "hardening",
+        "fortify"
+    ],
+    "authors": [
+        {
+            "name": "Sergey Zakharevich",
+            "homepage": "https://github.com/wobqqq"
+        }
+    ],
+    "homepage": "https://github.com/wobqqq/oc-fortify-plugin",
+    "support": {
+        "issues": "https://github.com/wobqqq/oc-fortify-plugin/issues",
+        "source": "https://github.com/wobqqq/oc-fortify-plugin",
+        "security": "https://github.com/wobqqq/oc-fortify-plugin/security/policy"
+    },
     "require": {
-        "php": ">=8.2.0",
-        "composer/installers": "~1.0"
+        "php": "^8.2",
+        "composer/installers": "^1.0 || ^2.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.48",
+        "friendsofphp/php-cs-fixer": "^3.88",
+        "october/rain": "^4.4",
+        "orchestra/testbench": "^10.6",
+        "pestphp/pest": "^4.1",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "rector/rector": "^2.2"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Wobqqq\\Fortify\\Tests\\": "tests/"
+        },
+        "classmap": [
+            "Plugin.php",
+            "cache/",
+            "client/",
+            "console/",
+            "dto/",
+            "enums/",
+            "instances/",
+            "listeners/",
+            "models/",
+            "queries/",
+            "services/",
+            "transformers/",
+            "widgets/"
+        ],
+        "files": [
+            "tests/Stubs/October.php"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "ergebnis/composer-normalize": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        },
+        "platform": {
+            "php": "8.4.99"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "installer-disable": true
+    },
+    "scripts": {
+        "code.check": [
+            "@composer validate --strict",
+            "@composer normalize --dry-run",
+            "@composer audit --abandoned=report",
+            "@code.lint",
+            "@code.yaml.check",
+            "@code.cs.check",
+            "@code.rector.check",
+            "@code.stan"
+        ],
+        "code.cs.check": "php-cs-fixer fix --diff --dry-run",
+        "code.cs.fix": "php-cs-fixer fix --diff",
+        "code.fix": [
+            "@composer normalize",
+            "@code.cs.fix",
+            "@code.rector.fix"
+        ],
+        "code.lint": "find . -path ./vendor -prune -o \\( -name '*.php' -o -name '*.htm' \\) -print0 | xargs -0 -n1 -P4 php -l > /dev/null",
+        "code.rector.check": "rector process --dry-run",
+        "code.rector.fix": "rector process",
+        "code.stan": "phpstan analyse --memory-limit=1G",
+        "code.yaml.check": "yaml-lint plugin.yaml updates/ models/ .github/",
+        "ready": [
+            "@code.fix",
+            "@code.check",
+            "@test.coverage"
+        ],
+        "test": "pest",
+        "test.coverage": "@php -d pcov.enabled=1 -d pcov.directory=. -d pcov.exclude=\"~/(vendor|tests)/~\" vendor/bin/pest --coverage --min=90",
+        "test.mutate": "@php -d pcov.enabled=1 -d pcov.directory=. -d pcov.exclude=\"~/(vendor|tests)/~\" vendor/bin/pest --mutate --parallel --min=70"
     }
 }
