@@ -14,7 +14,7 @@ It provides system diagnostics, configuration hardening tools, and integrates se
 
 ## 📊 Security Dashboard Widget
 
-Fortify includes a built-in dashboard widget that gives you a real-time overview of your system’s security status.
+Fortify includes a dashboard widget that gives you an overview of your application’s security status.
 
 - Highlights critical vulnerabilities and misconfigurations
 - Provides quick access to all security checks and tools
@@ -32,13 +32,13 @@ This widget acts as a central hub, allowing you to monitor and manage your appli
   Confirms that your application is running in a secure production mode.
 
 - **Admin panel URI check**
-  Warns if `/admin` is used, as it is commonly targeted by bots.
+  Warns when the backend URI is one bots scan for, such as `/admin` or `/backend`.
 
 - **Superuser accounts check**
   Detects if the number of superusers exceeds recommended limits.
 
 - **Outdated administrator accounts detection**
-  Identifies inactive or outdated admin users.
+  Counts the administrators who have not signed in for three months.
 
 - **Sensitive usernames detection**
   Detects unsafe usernames like `admin`.
@@ -106,7 +106,9 @@ Each module extends Fortify with additional protection layers.
 All configuration and management is handled via the October CMS admin panel.
 
 **Admin Panel:**
-Navigate to `Settings -> Fortify` to view security settings and enable/disable features.
+Navigate to `Settings -> Fortify` to view the security settings. The cookie, session, password and backend settings apply only once **Enabled** is switched on in the *Config* tab.
+
+**Dashboard widget:** add **Fortify** to the backend dashboard. The settings page and the widget need the `Fortify` permission (`app-fortify`).
 
 **Console Commands:**
 - Disable Fortify completely:
@@ -117,6 +119,7 @@ php artisan wobqqq.fortify:config:disable
 
 ## ⬆️ Upgrading
 
+- **1.0.4** — the Packagist page links to the marketplace, the documentation and the three ways to install. Nothing changes on an existing site.
 - **1.0.3** — password expiration is now a number of days (`0` turns it off). The previous switch never expired a password (October compared the days with `true`); the new setting starts at `0`, so nothing changes on update: set the number of days to start using it. The non-alphanumeric password rule is now applied to administrators' passwords.
 
 ## 🔒 Security
@@ -135,4 +138,4 @@ make test.coverage  # Pest with coverage (90 % minimum)
 make ready          # everything above
 ```
 
-Every pull request runs the same checks on GitHub Actions, plus a syntax check on PHP 8.2. Pushing a tag that matches the last version in `updates/version.yaml` releases it to the October CMS marketplace once CI has passed.
+Every pull request runs the same checks on GitHub Actions, plus a syntax check on PHP 8.2. Pushing a tag that matches the last version in `updates/version.yaml` publishes it as a GitHub release and to the October CMS marketplace once CI has passed.
