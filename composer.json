@@ -54,6 +54,7 @@
             "cache/",
             "client/",
             "console/",
+            "contracts/",
             "dto/",
             "enums/",
             "instances/",

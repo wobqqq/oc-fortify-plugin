@@ -6,12 +6,12 @@ namespace Wobqqq\Fortify\Client;
 
 use Arr;
 use OpenSSLCertificate;
+use Override;
+use Wobqqq\Fortify\Contracts\TlsCertificateProbe;
 
-class SslSecurityCheckerClient
+final class SslSecurityCheckerClient implements TlsCertificateProbe
 {
-    /**
-     * @return array<string, mixed>
-     */
+    #[Override]
     public function request(string $host, int $port = 443): array
     {
         $context = stream_context_create([

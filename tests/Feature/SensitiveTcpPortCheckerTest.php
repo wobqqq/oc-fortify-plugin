@@ -48,14 +48,14 @@ it('counts the open ports of a listed address only', function (): void {
     ]);
 
     $service = app(SensitiveTcpPortCheckerService::class);
-    [$ports, $public] = $service->check('127.0.0.1');
-    [$unlisted] = $service->check('192.0.2.1');
+    $report = $service->check('127.0.0.1');
+    $unlisted = $service->check('192.0.2.1');
 
     fclose($server);
 
-    expect($public)->toBe(1)
-        ->and($ports)->toHaveCount(2)
-        ->and($unlisted)->toBe([]);
+    expect($report->failures)->toBe(1)
+        ->and($report->results)->toHaveCount(2)
+        ->and($unlisted->results)->toBe([]);
 });
 
 it('suggests the commonly exposed ports', function (): void {

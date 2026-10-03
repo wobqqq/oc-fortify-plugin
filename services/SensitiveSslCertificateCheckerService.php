@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Wobqqq\Fortify\Services;
 
 use Config;
-use Wobqqq\Fortify\Client\SslSecurityCheckerClient;
+use Wobqqq\Fortify\Contracts\TlsCertificateProbe;
+use Wobqqq\Fortify\Dto\CheckReportDto;
 use Wobqqq\Fortify\Dto\SllCertificateCheckerTestResultDto;
 use Wobqqq\Fortify\Instances\SslCertificateCheckerDtoListInstance;
 use Wobqqq\Fortify\Transformers\FortifyTransformer;
 
 final readonly class SensitiveSslCertificateCheckerService
 {
-    public function __construct(private SslSecurityCheckerClient $sslSecurityCheckerClient)
+    public function __construct(private TlsCertificateProbe $tlsCertificateProbe)
     {
     }
 
@@ -32,9 +33,9 @@ final readonly class SensitiveSslCertificateCheckerService
     }
 
     /**
-     * @return array{0: array<string, SllCertificateCheckerTestResultDto>, 1: int}
+     * @return CheckReportDto<SllCertificateCheckerTestResultDto>
      */
-    public function check(string $host): array
+    public function check(string $host): CheckReportDto
     {
         $sslCertificateCheckerDtoList = SslCertificateCheckerDtoListInstance::instance()->get();
 
@@ -48,7 +49,7 @@ final readonly class SensitiveSslCertificateCheckerService
             }
 
             foreach ($sslCertificateCheckerDto->ports as $port) {
-                $responses = $this->sslSecurityCheckerClient->request(
+                $responses = $this->tlsCertificateProbe->request(
                     $sslCertificateCheckerDto->host,
                     $port,
                 );
@@ -75,6 +76,6 @@ final readonly class SensitiveSslCertificateCheckerService
 
         krsort($ports);
 
-        return [$ports, $numberOfHostsWithoutSsl];
+        return new CheckReportDto(array_values($ports), $numberOfHostsWithoutSsl);
     }
 }

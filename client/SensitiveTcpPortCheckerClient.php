@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace Wobqqq\Fortify\Client;
 
-class SensitiveTcpPortCheckerClient
+use Override;
+use Wobqqq\Fortify\Contracts\TcpPortProbe;
+
+final class SensitiveTcpPortCheckerClient implements TcpPortProbe
 {
-    public const OPENED = 'opened';
-
-    public const CLOSED = 'closed';
-
     /**
      * Every port is dialled at once and the whole check waits at most $timeout seconds,
      * however many ports are listed.
-     *
-     * @param array<int, int> $ports
-     *
-     * @return array<int, string>
      */
+    #[Override]
     public function request(string $ip, array $ports, int $timeout = 2): array
     {
         $host = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false ? sprintf('[%s]', $ip) : $ip;

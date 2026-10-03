@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use System\Classes\PluginManager;
 use System\Classes\UpdateManager;
+use Wobqqq\Fortify\Contracts\TlsCertificateProbe;
 use Wobqqq\Fortify\Dto\WidgetGroupItemDto;
 use Wobqqq\Fortify\Dto\WidgetItemLinkDto;
 use Wobqqq\Fortify\Enums\ButtonAction;
@@ -174,4 +176,23 @@ it('runs the sensitive files and certificate checks', function (): void {
         ->toContain('No sensitive files are publicly accessible via HTTP.')
         ->and(widgetAction(['action' => ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST->value, 'host' => 'unlisted.example']))
         ->toContain('SSL certificate checker report');
+});
+
+it('logs an unexpected failure and answers without its details', function (): void {
+    signInAs('app-fortify');
+    FortifySettings::set('tests', ['ssl_certificate_checker_hosts' => [['host' => 'example.com', 'ports' => '443']]]);
+    app()->instance(TlsCertificateProbe::class, new class () implements TlsCertificateProbe {
+        #[Override]
+        public function request(string $host, int $port = 443): array
+        {
+            throw new RuntimeException('socket secret detail');
+        }
+    });
+    $log = Log::spy();
+
+    $html = widgetAction(['action' => ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST->value, 'host' => 'example.com']);
+
+    expect($html)->toContain('Please check your input and try again.')
+        ->and($html)->not->toContain('socket secret detail');
+    $log->shouldHaveReceived('error')->once();
 });

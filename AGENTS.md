@@ -38,7 +38,8 @@ make ready          # all of the above: fix, check, coverage
 | `cache/` | `Cache::remember` wrappers keyed by `BasicCache::cacheKey()`; cleared on the settings `model.afterSave`. |
 | `instances/` | Per-request memo (`Singleton`) over the caches. |
 | `services/` | The behaviour. Services never read the request: the widget or the middleware passes what they need. |
-| `client/` | The only code that opens network connections (HTTP, TCP, TLS). |
+| `contracts/` | Interfaces for the network checks (`HttpStatusProbe`, `TcpPortProbe`, `TlsCertificateProbe`), bound in `Plugin::register()`; tests bind fakes. |
+| `client/` | The only code that opens network connections (HTTP, TCP, TLS): `final` implementations of the contracts. |
 | `enums/` | Every shared code: events, permissions, views, actions, modules. Reuse them instead of string literals. |
 | `listeners/` | Event subscribers. |
 | `widgets/` | The dashboard widget and its partials. |
@@ -57,6 +58,10 @@ The modules are separate plugins that users update independently, so a site may 
 - the view names `wobqqq.fortify::denied`, `wobqqq.fortify::bad-request` and the language keys the modules read.
 
 Add to these; do not rename or remove. A module must keep working with every released core version.
+
+## Architecture
+
+Read the architecture skills before changing how the plugin is structured: `application-layer` (thin widget handlers and commands, services with DTOs), `dependency-injection`, `error-handling` (field errors as `ValidationException`, business refusals as `ApplicationException`, anything else logged and shown as a generic message), `validation`, `events`, `testing-architecture`, `domain-layer-cqrs` and `plugin-boundaries` (the contract with the modules).
 
 ## Upgrading installed sites safely
 
