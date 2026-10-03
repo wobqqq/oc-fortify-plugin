@@ -119,6 +119,7 @@ php artisan wobqqq.fortify:config:disable
 
 ## ⬆️ Upgrading
 
+- **1.0.5** — internal refactoring. The dashboard widget now logs an unexpected error and shows a generic message instead of its text. Nothing else changes on an existing site.
 - **1.0.4** — the Packagist page links to the marketplace, the documentation and the three ways to install. Nothing changes on an existing site.
 - **1.0.3** — password expiration is now a number of days (`0` turns it off). The previous switch never expired a password (October compared the days with `true`); the new setting starts at `0`, so nothing changes on update: set the number of days to start using it. The non-alphanumeric password rule is now applied to administrators' passwords.
 
