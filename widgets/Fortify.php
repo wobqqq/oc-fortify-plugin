@@ -7,7 +7,9 @@ namespace Wobqqq\Fortify\Widgets;
 use Backend\Classes\ReportWidgetBase;
 use Backend\Facades\BackendAuth;
 use Input;
-use InvalidArgumentException;
+use Log;
+use October\Rain\Exception\ApplicationException;
+use October\Rain\Exception\ValidationException;
 use Throwable;
 use Wobqqq\Fortify\Enums\ButtonAction;
 use Wobqqq\Fortify\Enums\Permission;
@@ -70,8 +72,15 @@ class Fortify extends ReportWidgetBase
                 ButtonAction::SSL_CERTIFICATE_CHECKER_RUN_TEST => $this->sslCertificateCheckerRunTest(),
                 null => $this->errorPartial('Action does not exist.'),
             };
-        } catch (Throwable $e) {
+        } catch (ValidationException|ApplicationException $e) {
             return $this->errorPartial($e->getMessage());
+        } catch (Throwable $e) {
+            Log::error($e);
+
+            /** @var string $message */
+            $message = trans('wobqqq.fortify::lang.errors.bad_request_message');
+
+            return $this->errorPartial($message);
         }
     }
 
@@ -89,13 +98,13 @@ class Fortify extends ReportWidgetBase
 
         /** @var SensitiveFileCheckerService $sensitiveFileCheckerService */
         $sensitiveFileCheckerService = app(SensitiveFileCheckerService::class);
-        [$urls, $numberOfPublicUrls] = $sensitiveFileCheckerService->check($url);
+        $report = $sensitiveFileCheckerService->check($url);
 
         return $this->makePartial(
             'actions/sensitive_file_checker_run_test_result',
             [
-                'urls' => $urls,
-                'numberOfPublicUrls' => $numberOfPublicUrls,
+                'urls' => $report->results,
+                'numberOfPublicUrls' => $report->failures,
             ],
         );
     }
@@ -114,13 +123,13 @@ class Fortify extends ReportWidgetBase
 
         /** @var SensitiveTcpPortCheckerService $sensitiveTcpPortCheckerService */
         $sensitiveTcpPortCheckerService = app(SensitiveTcpPortCheckerService::class);
-        [$ports, $numberOfPublicPorts] = $sensitiveTcpPortCheckerService->check($ip);
+        $report = $sensitiveTcpPortCheckerService->check($ip);
 
         return $this->makePartial(
             'actions/sensitive_tcp_port_checker_run_test_result',
             [
-                'ports' => $ports,
-                'numberOfPublicPorts' => $numberOfPublicPorts,
+                'ports' => $report->results,
+                'numberOfPublicPorts' => $report->failures,
             ],
         );
     }
@@ -142,13 +151,13 @@ class Fortify extends ReportWidgetBase
 
         /** @var SensitiveSslCertificateCheckerService $sensitiveSslCertificateCheckerService */
         $sensitiveSslCertificateCheckerService = app(SensitiveSslCertificateCheckerService::class);
-        [$ports, $numberOfHostsWithoutSsl] = $sensitiveSslCertificateCheckerService->check($host);
+        $report = $sensitiveSslCertificateCheckerService->check($host);
 
         return $this->makePartial(
             'actions/ssl_certificate_checker_run_test_result',
             [
-                'ports' => $ports,
-                'numberOfHostsWithoutSsl' => $numberOfHostsWithoutSsl,
+                'ports' => $report->results,
+                'numberOfHostsWithoutSsl' => $report->failures,
             ],
         );
     }
@@ -158,7 +167,7 @@ class Fortify extends ReportWidgetBase
         $value = Input::get($name);
 
         if (!is_string($value) || trim($value) === '') {
-            throw new InvalidArgumentException(sprintf('The %s cannot be empty.', $name));
+            throw new ValidationException([$name => sprintf('The %s cannot be empty.', $name)]);
         }
 
         return trim($value);
