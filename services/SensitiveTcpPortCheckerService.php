@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Wobqqq\Fortify\Services;
 
-use Wobqqq\Fortify\Client\SensitiveTcpPortCheckerClient;
+use Wobqqq\Fortify\Contracts\TcpPortProbe;
+use Wobqqq\Fortify\Dto\CheckReportDto;
 use Wobqqq\Fortify\Dto\SensitiveTcpPortCheckerTestResultDto;
 use Wobqqq\Fortify\Instances\SensitiveTcpPortCheckerDtoListInstance;
 use Wobqqq\Fortify\Transformers\FortifyTransformer;
@@ -26,7 +27,7 @@ final readonly class SensitiveTcpPortCheckerService
         9200,
     ];
 
-    public function __construct(private SensitiveTcpPortCheckerClient $sensitiveTcpPortCheckerClient)
+    public function __construct(private TcpPortProbe $tcpPortProbe)
     {
     }
 
@@ -42,9 +43,9 @@ final readonly class SensitiveTcpPortCheckerService
     }
 
     /**
-     * @return array{0: array<string, SensitiveTcpPortCheckerTestResultDto>, 1: int}
+     * @return CheckReportDto<SensitiveTcpPortCheckerTestResultDto>
      */
-    public function check(string $ip): array
+    public function check(string $ip): CheckReportDto
     {
         $fortifySensitiveTcpPortCheckerDtoList = SensitiveTcpPortCheckerDtoListInstance::instance()->get();
 
@@ -57,13 +58,13 @@ final readonly class SensitiveTcpPortCheckerService
                 continue;
             }
 
-            $responses = $this->sensitiveTcpPortCheckerClient->request(
+            $responses = $this->tcpPortProbe->request(
                 $fortifySensitiveTcpPortCheckerDto->ip,
                 $fortifySensitiveTcpPortCheckerDto->ports,
             );
 
             foreach ($responses as $port => $status) {
-                $isPositive = $status !== SensitiveTcpPortCheckerClient::OPENED;
+                $isPositive = $status !== TcpPortProbe::OPENED;
                 $key = sprintf('%s-%s-%s', $status, $port, $fortifySensitiveTcpPortCheckerDto->ip);
                 $ports[$key] = FortifyTransformer::sensitiveTcpPortCheckerTestResultDto(
                     $fortifySensitiveTcpPortCheckerDto->ip,
@@ -80,6 +81,6 @@ final readonly class SensitiveTcpPortCheckerService
 
         krsort($ports);
 
-        return [$ports, $numberOfPublicPorts];
+        return new CheckReportDto(array_values($ports), $numberOfPublicPorts);
     }
 }

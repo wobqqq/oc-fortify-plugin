@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Wobqqq\Fortify\Services;
 
 use Config;
-use Wobqqq\Fortify\Client\SensitiveFileCheckerClient;
+use Wobqqq\Fortify\Contracts\HttpStatusProbe;
+use Wobqqq\Fortify\Dto\CheckReportDto;
 use Wobqqq\Fortify\Dto\SensitiveFileCheckerTestResultDto;
 use Wobqqq\Fortify\Instances\SensitiveFileCheckerDtoInstance;
 use Wobqqq\Fortify\Transformers\FortifyTransformer;
@@ -64,7 +65,7 @@ final readonly class SensitiveFileCheckerService
         'config',
     ];
 
-    public function __construct(private SensitiveFileCheckerClient $sensitiveFileCheckerClient)
+    public function __construct(private HttpStatusProbe $httpStatusProbe)
     {
     }
 
@@ -89,14 +90,14 @@ final readonly class SensitiveFileCheckerService
     }
 
     /**
-     * @return array{0: array<int, SensitiveFileCheckerTestResultDto>, 1: int}
+     * @return CheckReportDto<SensitiveFileCheckerTestResultDto>
      */
-    public function check(string $url): array
+    public function check(string $url): CheckReportDto
     {
         $fortifySensitiveFileCheckerDto = SensitiveFileCheckerDtoInstance::instance()->get();
 
         if (!in_array($url, $fortifySensitiveFileCheckerDto->urls, true)) {
-            return [[], 0];
+            return new CheckReportDto([], 0);
         }
 
         $urls = array_values(array_map(
@@ -104,7 +105,7 @@ final readonly class SensitiveFileCheckerService
             $fortifySensitiveFileCheckerDto->paths,
         ));
 
-        $responses = $this->sensitiveFileCheckerClient->request($urls);
+        $responses = $this->httpStatusProbe->request($urls);
 
         $urls = [];
 
@@ -123,6 +124,6 @@ final readonly class SensitiveFileCheckerService
             }
         }
 
-        return [$urls, $numberOfPublicUrls];
+        return new CheckReportDto($urls, $numberOfPublicUrls);
     }
 }

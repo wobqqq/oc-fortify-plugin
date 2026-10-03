@@ -10,6 +10,7 @@ return RectorConfig::configure()
         __DIR__ . '/cache',
         __DIR__ . '/client',
         __DIR__ . '/console',
+        __DIR__ . '/contracts',
         __DIR__ . '/dto',
         __DIR__ . '/enums',
         __DIR__ . '/instances',

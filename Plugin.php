@@ -7,7 +7,13 @@ namespace Wobqqq\Fortify;
 use Event;
 use System\Classes\PluginBase;
 use System\Classes\SettingsManager;
+use Wobqqq\Fortify\Client\SensitiveFileCheckerClient;
+use Wobqqq\Fortify\Client\SensitiveTcpPortCheckerClient;
+use Wobqqq\Fortify\Client\SslSecurityCheckerClient;
 use Wobqqq\Fortify\Console\ConfigDisableCommand;
+use Wobqqq\Fortify\Contracts\HttpStatusProbe;
+use Wobqqq\Fortify\Contracts\TcpPortProbe;
+use Wobqqq\Fortify\Contracts\TlsCertificateProbe;
 use Wobqqq\Fortify\Enums\Permission;
 use Wobqqq\Fortify\Listeners\BackendUserListener;
 use Wobqqq\Fortify\Listeners\FortifyListener;
@@ -19,6 +25,10 @@ final class Plugin extends PluginBase
     public function register(): void
     {
         $this->registerConsoleCommand('wobqqq.fortify:config:disable', ConfigDisableCommand::class);
+
+        $this->app->bind(HttpStatusProbe::class, SensitiveFileCheckerClient::class);
+        $this->app->bind(TcpPortProbe::class, SensitiveTcpPortCheckerClient::class);
+        $this->app->bind(TlsCertificateProbe::class, SslSecurityCheckerClient::class);
     }
 
     public function boot(): void

@@ -8,6 +8,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Wobqqq\Fortify\Client\SensitiveFileCheckerClient;
+use Wobqqq\Fortify\Contracts\HttpStatusProbe;
 use Wobqqq\Fortify\Models\Fortify;
 use Wobqqq\Fortify\Services\SensitiveFileCheckerService;
 
@@ -34,7 +35,7 @@ function fakeSensitiveFileResponses(array $answers): ArrayObject
     };
 
     app()->instance(
-        SensitiveFileCheckerClient::class,
+        HttpStatusProbe::class,
         new SensitiveFileCheckerClient(new Client(['handler' => HandlerStack::create($handler), 'http_errors' => false])),
     );
 
@@ -54,11 +55,11 @@ it('reports the paths a site serves as exposed', function (): void {
         'https://example.com/.git/config' => new ConnectException('timeout', new Request('GET', 'https://example.com/.git/config')),
     ]);
 
-    [$results, $exposed] = app(SensitiveFileCheckerService::class)->check('https://example.com');
+    $report = app(SensitiveFileCheckerService::class)->check('https://example.com');
 
-    $statuses = collect($results)->mapWithKeys(fn ($result): array => [$result->url => [$result->status, $result->isPositive]]);
+    $statuses = collect($report->results)->mapWithKeys(fn ($result): array => [$result->url => [$result->status, $result->isPositive]]);
 
-    expect($exposed)->toBe(2)
+    expect($report->failures)->toBe(2)
         ->and($statuses['https://example.com/.env'])->toBe(['200', false])
         ->and($statuses['https://example.com/.git/config'])->toBe(['error', false])
         ->and($statuses['https://example.com/composer.json'])->toBe(['404', true]);
@@ -70,18 +71,16 @@ it('does not read a redirect to another page as an exposed file', function (): v
         'https://example.com/' => new Response(200),
     ]);
 
-    [, $exposed] = app(SensitiveFileCheckerService::class)->check('https://example.com');
-
-    expect($exposed)->toBe(0);
+    expect(app(SensitiveFileCheckerService::class)->check('https://example.com')->failures)->toBe(0);
 });
 
 it('only scans the sites listed in the settings', function (): void {
     $requested = fakeSensitiveFileResponses([]);
 
-    [$results, $exposed] = app(SensitiveFileCheckerService::class)->check('https://attacker.example');
+    $report = app(SensitiveFileCheckerService::class)->check('https://attacker.example');
 
-    expect($results)->toBe([])
-        ->and($exposed)->toBe(0)
+    expect($report->results)->toBe([])
+        ->and($report->failures)->toBe(0)
         ->and($requested->getArrayCopy())->toBe([]);
 });
 

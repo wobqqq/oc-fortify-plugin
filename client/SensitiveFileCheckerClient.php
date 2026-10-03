@@ -7,24 +7,23 @@ namespace Wobqqq\Fortify\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use Override;
 use Psr\Http\Message\ResponseInterface;
+use Wobqqq\Fortify\Contracts\HttpStatusProbe;
 
-class SensitiveFileCheckerClient
+final readonly class SensitiveFileCheckerClient implements HttpStatusProbe
 {
     private const CONCURRENCY = 7;
 
-    public function __construct(private readonly ?Client $client = null)
+    public function __construct(private ?Client $client = null)
     {
     }
 
     /**
      * A redirect is not followed: a sensitive path that redirects to the home page
      * answers 200 there and would read as exposed.
-     *
-     * @param array<int, string> $urls
-     *
-     * @return array<string, int|string>
      */
+    #[Override]
     public function request(array $urls): array
     {
         $urls = array_values($urls);

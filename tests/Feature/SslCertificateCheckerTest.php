@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Wobqqq\Fortify\Client\SslSecurityCheckerClient;
+use Wobqqq\Fortify\Contracts\TlsCertificateProbe;
 use Wobqqq\Fortify\Models\Fortify;
 use Wobqqq\Fortify\Services\SensitiveSslCertificateCheckerService;
 use Wobqqq\Fortify\Tests\Support\Sockets;
@@ -10,7 +11,8 @@ use Wobqqq\Fortify\Tests\Support\Sockets;
 it('reports the certificate of every listed port', function (): void {
     Fortify::set('tests', ['ssl_certificate_checker_hosts' => [['host' => 'example.com', 'ports' => '443,993']]]);
 
-    app()->instance(SslSecurityCheckerClient::class, new class () extends SslSecurityCheckerClient {
+    app()->instance(TlsCertificateProbe::class, new class () implements TlsCertificateProbe {
+        #[Override]
         public function request(string $host, int $port = 443): array
         {
             return $port === 443
@@ -19,19 +21,19 @@ it('reports the certificate of every listed port', function (): void {
         }
     });
 
-    [$ports, $failed] = app(SensitiveSslCertificateCheckerService::class)->check('example.com');
+    $report = app(SensitiveSslCertificateCheckerService::class)->check('example.com');
 
-    expect($failed)->toBe(1)
-        ->and($ports)->toHaveCount(2)
-        ->and(array_values($ports)[0]->isPositive)->toBeTrue();
+    expect($report->failures)->toBe(1)
+        ->and($report->results)->toHaveCount(2)
+        ->and($report->results[0]->isPositive)->toBeTrue();
 });
 
 it('does not connect to a host that is not listed', function (): void {
     Fortify::set('tests', ['ssl_certificate_checker_hosts' => [['host' => 'example.com', 'ports' => '443']]]);
 
-    [$ports, $failed] = app(SensitiveSslCertificateCheckerService::class)->check('internal.example');
+    $report = app(SensitiveSslCertificateCheckerService::class)->check('internal.example');
 
-    expect($ports)->toBe([])->and($failed)->toBe(0);
+    expect($report->results)->toBe([])->and($report->failures)->toBe(0);
 });
 
 it('answers an unreachable host with an error', function (): void {
